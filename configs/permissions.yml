@@ -1,0 +1,53 @@
+permissions:
+  admin:
+    - '*'
+    # - '*'
+
+  moder:
+    - '-social'
+    - '-voice'
+    - '*'
+
+  tester:
+    # - 'voice.mute'
+    # - 'voice.unmute'
+    # - 'voice.mutelist'
+    # - 'voice.block'
+    # - 'voice.unblock'
+    # - 'voice.blocklist'
+
+  sponsor:
+    # - 'donate.status.*'
+    # - 'voice.notblock'
+
+  social:
+    # - 'social.*'
+
+  user: 
+    - 'generator.*'
+    # - 'voice.block'
+    # - 'voice.unblock'
+    # - 'voice.mute'
+    # - 'voice.unmute'
+
+groups:
+  social:
+
+  admin:
+    - '&805944675243917370' #admin
+    - '&805944675243917369' #support
+
+  moder:
+    - '&805944675243917368' #moder
+
+  sponsor:
+    - '&805944675243917362' #sponsor XL
+    - '&805944675235397681' #sponsor +
+    - '&805944675235397680' #sponsor
+    - '&806967771635122188' #booster
+
+  user:
+    - '&805944675188867112' #everyone 
+
+  tester:
+    # - '694055134166253588' # Yetoll

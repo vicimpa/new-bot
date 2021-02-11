@@ -1,0 +1,155 @@
+{
+  "osRoles": {
+    "name": "Выберите Ваши операционные системы.",
+    "description": "Поставьте внизу соответствующую реакцию.",
+    "roles": [
+      {
+        "name": "Windows",
+        "color": null,
+        "emoji": "windows"
+      },
+      {
+        "name": "Linux",
+        "color": null,
+        "emoji": "linux"
+      },
+      {
+        "name": "macOS",
+        "color": null,
+        "emoji": "macos"
+      }
+    ]
+  },
+  "specificRoles": {
+    "name": "Выберете Ваши направления в IT.",
+    "description": "Аналогично поставьте внизу нужную реакцию.",
+    "roles": [
+      {
+        "name": "3D",
+        "color": "#10e2ca",
+        "emoji": "3d"
+      },
+      {
+        "name": "Neural",
+        "color": "#27690b",
+        "emoji": "neural"
+      },
+      {
+        "name": "BotDev",
+        "color": "#810f0f",
+        "emoji": "bot"
+      },
+      {
+        "name": "AppDev",
+        "color": "#1e28af",
+        "emoji": "app"
+      },
+      {
+        "name": "WebDev",
+        "color": "#dbc500",
+        "emoji": "web"
+      },
+      {
+        "name": "Hardware",
+        "color": "#700641",
+        "emoji": "hardware"
+      },
+      {
+        "name": "GameDev",
+        "color": "#e4047e",
+        "emoji": "game"
+      },
+      {
+        "name": "MobileDev",
+        "color": "#3fb48a",
+        "emoji": "mobile"
+      },
+      {
+        "name": "Designer",
+        "color": "#7914d3",
+        "emoji": "design"
+      }
+    ]
+  },
+  "languageRoles": {
+    "name": "Выберите языки, которые Вы изучаете или знаете.",
+    "description": "Проставьте необходимые Вам реакции для получения ролей.",
+    "roles": [
+      {
+        "name": "JavaScript",
+        "color": "#F3D83F",
+        "emoji": "js"
+      },
+      {
+        "name": "Java",
+        "color": "#E86B21",
+        "emoji": "java"
+      },
+      {
+        "name": "Python",
+        "color": "#336487",
+        "emoji": "python"
+      },
+      {
+        "name": "Kotlin",
+        "color": "#6272D6",
+        "emoji": "kotlin"
+      },
+      {
+        "name": "Go",
+        "color": "#00A7CD",
+        "emoji": "go"
+      },
+      {
+        "name": "C#",
+        "color": "#994895",
+        "emoji": "csharp"
+      },
+      {
+        "name": "C++",
+        "color": "#5995C8",
+        "emoji": "cpp"
+      },
+      {
+        "name": "C",
+        "color": "#5469B7",
+        "emoji": "c_"
+      },
+      {
+        "name": "PHP",
+        "color": "#7177AB",
+        "emoji": "php"
+      },
+      {
+        "name": "HTML",
+        "color": "#F26134",
+        "emoji": "html"
+      },
+      {
+        "name": "CSS",
+        "color": "#0063E5",
+        "emoji": "css"
+      },
+      {
+        "name": "Rust",
+        "color": "#F57F26",
+        "emoji": "rust"
+      },
+      {
+        "name": "Dart",
+        "color": "#005593",
+        "emoji": "dart"
+      },
+      {
+        "name": "Swift",
+        "color": "#FC7C46",
+        "emoji": "swift"
+      },
+      {
+        "name": "Ruby",
+        "color": "#CF1A18",
+        "emoji": "ruby"
+      }
+    ]
+  }
+}

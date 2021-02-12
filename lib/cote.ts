@@ -10,6 +10,8 @@ import {
   Subscriber
 } from "cote"
 
+import { getName } from "~/lib/main";
+
 export {
   Requester,
   Responder,
@@ -24,12 +26,14 @@ export {
 
 class Base { }
 
+const state = { req: null as Requester, res: null as Responder }
+
 export function makeRequester<T extends Base>(root: T): T {
   const keys = Object.getOwnPropertyNames(root.constructor.prototype)
     .filter(e => typeof root[e] == 'function' && e != 'constructor')
 
   const { name } = root.constructor
-  const req = new Requester({ name })
+  const req = state.req || (state.req = new Requester({ name: name+'Req', key: name+'Req', requests: [name+'Res']}))
 
   if (!keys.length) return {} as any
   const obj = {} as any
@@ -37,7 +41,7 @@ export function makeRequester<T extends Base>(root: T): T {
   for (let key of keys) {
     obj[key] = (...args) =>
       new Promise((resolve, reject) => {
-        req.send({ type: [name, key].join('.'), args }, (err, result) => {
+        req.send({ type: [name, key].join('.'), args }, (err, {result} = {}) => {
           if (err) return reject(err)
           resolve(result)
         })
@@ -52,12 +56,13 @@ export function makeRunner<T extends Base>(root: T) {
     .filter(e => typeof root[e] == 'function' && e != 'constructor')
 
   const { name } = root.constructor
-  const res = new Responder({ name: name })
+  const res = state.res || (state.res = new Responder({ name: name+'Res', key: name+'Res', respondsTo: [name+'Req'] }))
 
   for (let key of keys) {
+    console.log([name, key].join('.'))
     res.on([name, key].join('.'), (event, callback) => {
       root[key](...(typeof event['args'] == 'undefined' ? [] : event['args']))
-        .then(result => callback(null, result))
+        .then(result => callback(null, {result}))
         .catch(callback)
     })
   }

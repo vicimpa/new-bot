@@ -1,12 +1,13 @@
 permissions:
   admin:
     - '*'
-    # - '*'
 
   moder:
     - '-social'
-    - '-voice'
     - '*'
+
+  checker:
+    - 'prorole.base'
 
   tester:
     # - 'voice.mute'
@@ -18,20 +19,56 @@ permissions:
 
   sponsor:
     # - 'donate.status.*'
-    # - 'voice.notblock'
+    - 'voice.notblock'
+    - 'voice.notmute'
 
   social:
     # - 'social.*'
 
   user: 
     - 'generator.*'
-    # - 'voice.block'
-    # - 'voice.unblock'
-    # - 'voice.mute'
-    # - 'voice.unmute'
+    - 'voice.block'
+    - 'voice.blocklist'
+    - 'voice.unblock'
+    - 'voice.unblockall'
+    - 'voice.name'
+    - 'voice.setname'
+    - 'voice.limit'
+    - 'voice.setlimit'
+    - 'voice.mute'
+    - 'voice.mutelist'
+    - 'voice.unmute'
+    - 'voice.unmuteall'
 
 groups:
   social:
+
+  checker:
+    - '&807062020771676180' #3d
+    - '&807062023309230100' #neural
+    - '&807062025590800405' #bot
+    - '&807062027549409313' #app
+    - '&807062029424394282' #web
+    - '&807062031500181555' #hard
+    - '&807062034335531018' #game
+    - '&807062036231225384' #mobile
+    - '&807062038106341376' #design
+
+    - '&807062090309304341' #js
+    - '&807062093278740490' #java
+    - '&807062095988260934' #py
+    - '&807062098144133151' #kotlin
+    - '&807062101217902622' #go
+    - '&807062104208572436' #c#
+    - '&807062106666958878' #c++
+    - '&807062108919300136' #c
+    - '&807062111661326356' #php
+    - '&807062113927299073' #html
+    - '&807062116741021717' #css
+    - '&807062119132299275' #rust
+    - '&807062121527246849' #dart
+    - '&807062124441501717' #swift
+    - '&807062126606024765' #ruby
 
   admin:
     - '&805944675243917370' #admin
@@ -39,6 +76,7 @@ groups:
 
   moder:
     - '&805944675243917368' #moder
+    - '681736660572045413'  #PromiSe (Twink)
 
   sponsor:
     - '&805944675243917362' #sponsor XL

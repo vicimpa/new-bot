@@ -2,11 +2,18 @@
 
 import { GuildMember, Role, TextChannel, User } from "discord.js";
 import { guildId, rolesChannel } from "~/config";
-import { client } from "~/lib/control";
+import { client } from "~/lib/commands";
 import { main } from "~/lib/main";
+import { makeRunner } from "~/lib/cote";
+import { ProroleModel } from "~/models/Prorole";
+import { register, method, makeApi } from "~/lib/rpcapi";
 import { osRoles, specificRoles, languageRoles } from "~/roles.json";
 
-const rolesStore = [...osRoles.roles, ...specificRoles.roles, ...languageRoles.roles] as {
+const rolesStore = [
+  ...osRoles.roles,
+  ...specificRoles.roles,
+  ...languageRoles.roles
+] as {
   name: string,
   color: string,
   emoji: string,
@@ -15,11 +22,90 @@ const rolesStore = [...osRoles.roles, ...specificRoles.roles, ...languageRoles.r
   checkRole?: Role
 }[]
 
+enum Status {
+  OK,
+  NO_METHOD,
+  ROLE_EXISTS,
+  UNKNOW_ERROR
+}
+
+@register()
+export class RolesApi {
+  @method()
+  async canCheck(rolesString: string, role: string) {
+    const roles = rolesString.split('|')
+    const can = rolesStore.filter(e => e.checkRole && roles.indexOf(e.checkRole.id) != -1)
+    return !!can.find(e => e.emoji == role)
+  }
+
+  @method()
+  async getEmoji(roleId: string) {
+    const role = rolesStore.find(e => e.proRole && e.proRole.id == roleId)
+    if (!role) return null
+    return role.emoji
+  }
+
+  @method()
+  async execute(type: 'append' | 'remove', userId: string, roleId: string) {
+    const emoji = await this.getEmoji(roleId)
+
+    try {
+      const user = await ProroleModel.getUser(userId)
+
+      if (type == 'append') {
+        if (user.check(emoji))
+          return Status.ROLE_EXISTS
+
+        await user.addRole(emoji)
+      } else
+        if (type == 'remove') {
+          if (!user.check(emoji))
+            return Status.ROLE_EXISTS
+
+          await user.delRole(emoji)
+        } else {
+          return Status.NO_METHOD
+        }
+
+      await this.checkUpdate(userId, emoji)
+        .catch(e => { })
+      return Status.OK
+    } catch (e) {
+      return Status.UNKNOW_ERROR
+    }
+  }
+
+  @method()
+  async checkUpdate(userId: string, role: string) {
+    const guild = await client.guilds.fetch(guildId)
+    const channel = await guild.channels.cache.get(rolesChannel)
+
+    if (!(channel instanceof TextChannel))
+      return
+
+    const messages = await channel.messages.fetch()
+    for (let [, mess] of messages) {
+      for (let [, react] of mess.reactions.cache) {
+        if (react.emoji.name == role) {
+          const users = await react.users.fetch()
+          const user = users.find(e => e.id == userId)
+          const member = await guild.members.fetch(userId)
+          chechUser(member, role, !!user)
+            .catch(() => { })
+          return
+        }
+      }
+    }
+  }
+
+  static Status = Status
+}
+
 async function chechUser(user: GuildMember, react: string, check = true) {
   if (!user) return
   if (user.user.bot) return
 
-  const havePro = false
+  const havePro = await ProroleModel.check(user.id, react)
   const storedRole = rolesStore.find(e => e.emoji == react)
   const { proRole, baseRole } = storedRole
   const role = (havePro && proRole) ? proRole : baseRole
@@ -82,6 +168,7 @@ async function loadRoles() {
 
 main(__filename, async () => {
   const guild = await client.guilds.fetch(guildId)
+  makeApi(RolesApi)
 
   client.on('ready', () => {
     Promise.resolve()

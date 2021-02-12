@@ -14,7 +14,7 @@
  *  /voice set limit @limit 
  */
 
-import { guildId } from "~/config"
+import { guildId, logs } from "~/config"
 import {
   SlashCommand,
   CommandOptionType,
@@ -25,9 +25,11 @@ import {
 import { permission, testPermission } from "~/lib/permissions";
 import { VoiceApi } from "~/services/private";
 import { makeRequester } from "~/lib/cote";
+import { ApiSender } from "~/services/sender";
 
 const { Status, Action } = VoiceApi
-const api = makeRequester(new VoiceApi())
+const api = new VoiceApi()
+const sender = new ApiSender()
 
 const {
   INTEGER: Int,
@@ -156,15 +158,29 @@ class Voice extends SlashCommand {
     if (ctx.member.id == user || await testPermission(user, 'voice.no.block'))
       return {
         ephemeral: true,
-        content: `Вы не можете применить эту команду к данному пользоватею!`
+        content: `Вы не можете применить эту команду к данному пользователю!`
       }
 
     const status = await api.set(ctx.member.id, user, Action.ADD, Action.NO)
 
+
     switch (status) {
-      case Status.OK: return {
+      case Status.OK: {
+        sender.privateBlockeSend(ctx.member.id, true, user)
+          .catch(console.log)
+
+        if(ctx.channelID == logs.voice)
+          return
+
+        return {
+          ephemeral: true,
+          content: `Запрет на подключение пользователя <@${user}> успешно добавлен.`
+        }
+      }
+
+      case Status.LIMIT: return {
         ephemeral: true,
-        content: `Запрет на подключение пользователя <@${user}> успешно добавлен.`
+        content: `Вы превысили лимит блокировок в канале.`
       }
 
       case Status.USER_EXISTS: return {
@@ -192,9 +208,16 @@ class Voice extends SlashCommand {
     const status = await api.set(ctx.member.id, user, Action.REMOVE, Action.NO)
 
     switch (status) {
-      case Status.OK: return {
-        ephemeral: true,
-        content: `Запрет на подключение пользователя <@${user}> успешно удален.`
+      case Status.OK: {
+        sender.privateBlockeSend(ctx.member.id, false, user)
+          .catch(console.log)        
+          
+        if(ctx.channelID == logs.voice)
+          return
+        return {
+          ephemeral: true,
+          content: `Запрет на подключение пользователя <@${user}> успешно удален.`
+        }
       }
 
       case Status.USER_EXISTS: return {
@@ -207,14 +230,26 @@ class Voice extends SlashCommand {
     }
   }
 
-  @permission('voice.unblock.all')
+  @permission('voice.unblockall')
   async unblockall(ctx: CommandContext, opt: ConvertedOption) {
     const status = await api.clear(ctx.member.id, true, false)
 
     switch (status) {
-      case Status.OK: return {
+      case Status.OK: {
+        sender.privateBlockeSend(ctx.member.id, false)
+          .catch(console.log)
+
+        if(ctx.channelID == logs.voice)
+          return
+        return {
+          ephemeral: true,
+          content: `Запрет на подключение всех пользователей успешно удален.`
+        }
+      }
+      
+      case Status.USER_EXISTS: return {
         ephemeral: true,
-        content: `Запрет на подключение всех пользователей успешно удален.`
+        content: `Ваш список блокировок пуст.`
       }
 
       default:
@@ -231,15 +266,29 @@ class Voice extends SlashCommand {
     if (ctx.member.id == user || await testPermission(user, 'voice.no.mute'))
       return {
         ephemeral: true,
-        content: `Вы не можете применить эту команду к данному пользоватею!`
+        content: `Вы не можете применить эту команду к данному пользователю!`
       }
 
     const status = await api.set(ctx.member.id, user, Action.NO, Action.ADD)
-
+    
     switch (status) {
-      case Status.OK: return {
+      case Status.OK: {
+        sender.privateMuteSend(ctx.member.id, true, user)
+          .catch(console.log)
+
+
+        if(ctx.channelID == logs.voice)
+          return
+
+        return {
+          ephemeral: true,
+          content: `Запрет голоса у пользователя <@${user}> успешно добавлен.`
+        }
+      }
+
+      case Status.LIMIT: return {
         ephemeral: true,
-        content: `Запрет голоса у пользователя <@${user}> успешно добавлен.`
+        content: `Вы превысили лимит блокировок в канале.`
       }
 
       case Status.USER_EXISTS: return {
@@ -268,9 +317,17 @@ class Voice extends SlashCommand {
     const status = await api.set(ctx.member.id, user, Action.NO, Action.REMOVE)
 
     switch (status) {
-      case Status.OK: return {
-        ephemeral: true,
-        content: `Запрет голоса у пользователя <@${user}> успешно удален.`
+      case Status.OK: {
+        sender.privateMuteSend(ctx.member.id, false, user)
+          .catch(console.log)
+
+        if(ctx.channelID == logs.voice)
+          return
+
+        return {
+          ephemeral: true,
+          content: `Запрет голоса у пользователя <@${user}> успешно удален.`
+        }
       }
 
       case Status.USER_EXISTS: return {
@@ -284,14 +341,27 @@ class Voice extends SlashCommand {
     return
   }
 
-  @permission('voice.unmute.all')
+  @permission('voice.unmuteall')
   async unmuteall(ctx: CommandContext, opt: ConvertedOption) {
     const status = await api.clear(ctx.member.id, false, true)
 
     switch (status) {
-      case Status.OK: return {
+      case Status.OK: {
+        sender.privateMuteSend(ctx.member.id, false)
+          .catch(console.log)
+        
+        if(ctx.channelID == logs.voice)
+          return
+
+        return {
+          ephemeral: true,
+          content: `Запрет голоса у всех пользователей успешно удален.`
+        }
+      }
+      
+      case Status.USER_EXISTS: return {
         ephemeral: true,
-        content: `Запрет голоса у всех пользователей успешно удален.`
+        content: `Ваш список мутов пуст.`
       }
 
       default:
@@ -315,7 +385,7 @@ class Voice extends SlashCommand {
     return this.setName(ctx, name)
   }
 
-  @permission('voice.name.set')
+  @permission('voice.setname')
   async setName(ctx: CommandContext, name: string) {
     if(name.length < 3 || name.length > 40)
       return {
@@ -345,7 +415,7 @@ class Voice extends SlashCommand {
     return this.setLimit(ctx, limit)
   }
 
-  @permission('voice.limit.set')
+  @permission('voice.setlimit')
   async setLimit(ctx: CommandContext, limit: number) {
     const v = await api.setLimit(ctx.member.id, limit)
     if(v == Status.UNKNOW_ERROR) throw new Error(Status[v])
@@ -371,7 +441,7 @@ class Voice extends SlashCommand {
       console.error(e)
       return {
         ephemeral: true,
-        content: `Ошибка выполнения команды! Обратитесь за помощью к Support!`
+        content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`
       }
     }
   }

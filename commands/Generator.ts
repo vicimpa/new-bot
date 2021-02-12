@@ -154,7 +154,7 @@ class Generator extends SlashCommand {
       console.error(e)
       return {
         ephemeral: true,
-        content: `Ошибка выполнения команды! Обратитесь за помощью к Support!`
+        content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`
       }
     }
   }

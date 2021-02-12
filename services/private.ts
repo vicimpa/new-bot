@@ -8,6 +8,7 @@ import { createdName, guildId, privates, removePrivateAfter, blockLimit } from "
 import { delay } from "~/lib/delay";
 import { makeRunner } from "~/lib/cote";
 import { PrivateModel } from "~/models/Private";
+import { register, makeApi, method } from "~/lib/rpcapi";
 
 const groups: RoomsStore[] = []
 
@@ -34,7 +35,9 @@ interface IInfo {
   mutes: string[]
 }
 
+@register()
 export class VoiceApi {
+  @method()
   async set(user: string, blockId: string, block = Action.NO, mute = Action.NO) {
     if (!block && !mute) return Status.NO_METHOD
 
@@ -88,6 +91,7 @@ export class VoiceApi {
     return Status.OK
   }
 
+  @method()
   async list(user: string, block = false, mute = false) {
     if (!block && !mute) return []
 
@@ -98,6 +102,7 @@ export class VoiceApi {
     return []
   }
 
+  @method()
   async clear(user: string, block = false, mute = false) {
     if (!block && !mute) return Status.NO_METHOD
 
@@ -105,8 +110,18 @@ export class VoiceApi {
     if(!info) return Status.UNKNOW_ERROR
     const group = RoomsStore.findGroup(user)
 
-    if (block) info.blocks = []
-    if (mute) info.mutes = []
+    if (block) {
+      if(!info.blocks.length)
+        return Status.USER_EXISTS
+
+      info.blocks = []
+    }
+    if (mute) {
+      if(!info.mutes.length)
+        return Status.USER_EXISTS
+
+      info.mutes = []
+    }
 
     if (group) {
       const channelInfo = await group.convertInfo(info)
@@ -121,6 +136,7 @@ export class VoiceApi {
     return Status.OK
   }
 
+  @method()
   async getInfo(user: string) {
     const guild = await client.guilds.fetch(guildId)
       .catch(e => null as Guild)
@@ -135,6 +151,7 @@ export class VoiceApi {
     return await RoomsStore.loadInforoom(member)
   }
 
+  @method()
   async setName(user: string, name: string) {
     const info = await this.getInfo(user)
     if(!info) return Status.UNKNOW_ERROR
@@ -157,6 +174,7 @@ export class VoiceApi {
     return Status.OK
   }
 
+  @method()
   async setLimit(user: string, limit: number) {
     const info = await this.getInfo(user)
     if(!info) return Status.UNKNOW_ERROR
@@ -417,7 +435,8 @@ async function tick() {
 }
 
 main(__filename, () => {
-  makeRunner(new VoiceApi())
+  // makeRunner(new VoiceApi())
+  makeApi(VoiceApi)
 
   client.on('ready', () => {
     client.guilds.fetch(guildId)

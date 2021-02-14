@@ -102,7 +102,7 @@ class Report extends SlashCommand {
 
     return {
       ephemeral: true,
-      content: `Скоро будет готово.`
+      content: `Ваша жалоба успешно принята.`
     }
   }
 

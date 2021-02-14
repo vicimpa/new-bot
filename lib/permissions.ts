@@ -29,6 +29,9 @@ export async function testPermission(userId: string, permission: string) {
     const member = await guild.members.fetch(userId)
     const rolesId = member.roles.cache.array().map(e => e.id)
     const data = yaml.parse(file) as IData
+
+    if(member.user.bot)
+      return true
     
     const can = Object.keys(data.permissions).filter((k, i, d) => {
       const perms = data.permissions[k] || []

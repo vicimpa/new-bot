@@ -78,4 +78,4 @@ class Social extends SlashCommand {
   }
 }
 
-export = Social
+// export = Social

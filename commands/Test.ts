@@ -49,4 +49,4 @@ class Test extends SlashCommand {
   }
 }
 
-export = Test
+// export = Test

@@ -56,7 +56,7 @@ async function makeMessage(msg: Message) {
   if(msg.reactions.cache.size)
     return
 
-  makeReactions(msg)
+  makeReactions(msg).catch(e => Logger.error(e))
   reply(rep.userId, `[report:${id}]`,`Ваша жалоба на <@${rep.reportedId}> получена.`)
 }
 
@@ -95,7 +95,7 @@ async function addReaction(msg: MessageReaction, user: User) {
       const rep = await ReportModel.acceptReport(id)
         .catch(e => Logger.error(e))
 
-      makeMessage(msg.message)
+      makeMessage(msg.message).catch(e => Logger.error(e))
 
       if(rep)
         reply(
@@ -110,7 +110,7 @@ async function addReaction(msg: MessageReaction, user: User) {
       const rep = await ReportModel.closeReport(id)
         .catch(e => Logger.error(e))
 
-      makeMessage(msg.message)
+      makeMessage(msg.message).catch(e => Logger.error(e))
 
       if(rep)
         reply(

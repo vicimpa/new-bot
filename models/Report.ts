@@ -19,7 +19,7 @@ class Report extends Base {
   reportedId: string
 
   @field(String)
-  messageUrl?: string
+  moderator?: string
 
   @field({ type: String, required: true })
   message: String
@@ -31,7 +31,10 @@ class Report extends Base {
   updated: Date
 
   @method()
-  async changeStatus(status: Status) {
+  async changeStatus(status: Status, moderator?: string) {
+    if(moderator)
+      this.moderator = moderator
+
     this.status = status
     return this.save()
   }
@@ -65,16 +68,16 @@ export class ReportModel extends makeModel(Report) {
     return new Date(hold)
   }
 
-  static async closeReport(_id: string) {
+  static async closeReport(_id: string, moderator?: string) {
     const find = await this.findOne({ _id, status: Status.PENDING })
     if (!find) return
-    return find.changeStatus(Status.CLOSE)
+    return find.changeStatus(Status.CLOSE, moderator)
   }
 
-  static async acceptReport(_id: string) {
+  static async acceptReport(_id: string, moderator?: string) {
     const find = await this.findOne({ _id, status: Status.PENDING })
     if (!find) return
-    return find.changeStatus(Status.ACCEPT)
+    return find.changeStatus(Status.ACCEPT, moderator)
   }
 
   static Status = Status

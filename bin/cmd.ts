@@ -1,5 +1,6 @@
 import { bots, commandsPath, guildId } from "~/config"
 import { SlashCreator } from "slash-create"
+import { Logger } from "~/lib/logger"
 
 const creator = new SlashCreator({
   applicationID: bots.cmd.client,
@@ -10,25 +11,25 @@ const creator = new SlashCreator({
 
 async function main() {
   const d = await creator.api.getCommands(guildId)
-  console.log('Regestred now ' + d.length)
+  Logger.log('Regestred now ' + d.length)
   
   creator   
     .on('synced', async () => {
       const d = await creator.api.getCommands(guildId)
-      console.log('Ok. Now count: ' + d.length)
+      Logger.log('Ok. Now count: ' + d.length)
       process.exit(0)
     })
     .on('error', (e) => {
-      console.error(e)
+      Logger.error(e)
     })
   
   await creator.syncCommandsIn(guildId, true)
 
-  console.log('Deleted!')
+  Logger.log('Deleted!')
 
   await creator
     .registerCommandsIn(commandsPath)
     .syncCommands()
 }
 
-main().catch(console.error)
+main().catch(e => Logger.error(e))

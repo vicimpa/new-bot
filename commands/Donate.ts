@@ -7,6 +7,7 @@ import {
   ConvertedOption
 } from "slash-create"
 import { permission } from "~/lib/permissions"
+import { Logger } from "../lib/logger"
 
 const {
   INTEGER: Int,
@@ -126,7 +127,7 @@ class Donate extends SlashCommand {
 
       throw new Error('No method!')
     } catch (e) {
-      console.error(e)
+      Logger.error(e)
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`

@@ -16,6 +16,7 @@ import { logger } from "~/lib/logger";
 import { exrouter } from "~/lib/exrouter";
 import { main } from "~/lib/main";
 import { client } from "~/lib/commands";
+import { Logger } from "~/lib/logger";
 
 const app = express()
 const server = new Server(app)
@@ -39,8 +40,8 @@ main(__filename, () => {
   creator
     .withServer(exrouter(router))
     .registerCommandsIn(commandsPath)
-    .on('error', console.log)
+    .on('error', Logger.log)
 
   server.listen(httpPort, httpHost, () =>
-    console.log(`Server start on ${httpHost}:${httpPort} `))
+    Logger.log(`Server start on ${httpHost}:${httpPort} `))
 })

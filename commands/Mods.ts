@@ -7,6 +7,7 @@ import {
   SlashCreator
 } from "slash-create";
 import { permission, testPermission } from "~/lib/permissions";
+import { Logger } from "../lib/logger";
 
 const {
   INTEGER: Int,
@@ -21,20 +22,91 @@ class Mods extends SlashCommand {
 
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: 'voice',
-      description: 'Управление голосовым каналом',
+      name: 'mod',
+      description: 'Команды для модерации',
 
       options: [
         {
           type: Sub,
-          name: 'block',
-          description: 'Заблокировать пользователя в своем канале',
+          name: 'mutevoice',
+          description: 'Выключить микрофон пользователю',
           options: [
             {
               type: User,
               name: 'user',
               required: true,
               description: 'Пользователь для блокировки'
+            },
+            {
+              type: Str,
+              name: 'reson',
+              required: true,
+              description: 'Причина блокировки'
+            },
+            {
+              type: Str,
+              name: 'time',
+              description: 'Время блокировки (30m default)'
+            }
+          ]
+        },
+        {
+          type: Sub,
+          name: 'unmutevoice',
+          description: 'Включить микрофон пользователю',
+          options: [
+            {
+              type: User,
+              name: 'user',
+              required: true,
+              description: 'Пользователь для разблокировки'
+            },
+            {
+              type: Str,
+              name: 'reson',
+              description: 'Причина разблокировки'
+            }
+          ]
+        },
+        {
+          type: Sub,
+          name: 'mutechat',
+          description: 'Запретить писать сообщения пользователю',
+          options: [
+            {
+              type: User,
+              name: 'user',
+              required: true,
+              description: 'Пользователь для блокировки'
+            },
+            {
+              type: Str,
+              name: 'reson',
+              required: true,
+              description: 'Причина блокировки'
+            },
+            {
+              type: Str,
+              name: 'time',
+              description: 'Время блокировки (30m default)'
+            }
+          ]
+        },
+        {
+          type: Sub,
+          name: 'unmutechat',
+          description: 'Разрешить писать сообщения пользователю',
+          options: [
+            {
+              type: User,
+              name: 'user',
+              required: true,
+              description: 'Пользователь для разблокировки'
+            },
+            {
+              type: Str,
+              name: 'reson',
+              description: 'Причина разблокировки'
             }
           ]
         }
@@ -42,31 +114,36 @@ class Mods extends SlashCommand {
     })
   }
 
-  // @permission('voice.block')
-  async block(ctx: CommandContext, opt: ConvertedOption) {
-    // const { user = '' } = opt as any
-    // if (ctx.member.id == user || await testPermission(user, 'voice.no.block'))
-    //   return {
-    //     ephemeral: true,
-    //     content: `Вы не можете применить эту команду к данному пользоватею!`
-    //   }
+  @permission('mod.mutevoice')
+  async mutevoice(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '', reson = '', time = '30m' } = opt as any
+    if (ctx.member.id == user || await testPermission(user, 'mod.nomutevoice'))
+      return {
+        ephemeral: true,
+        content: `Вы не можете применить эту команду к данному пользоватею!`
+      }
+  }
 
-    // const status = await api.set(ctx.member.id, user, Action.ADD, Action.NO)
+  @permission('mod.unmutevoice')
+  async unmutevoice(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '', reson = '' } = opt as any
 
-    // switch (status) {
-    //   case Status.OK: return {
-    //     ephemeral: true,
-    //     content: `Запрет на подключение пользователя <@${user}> успешно добавлен.`
-    //   }
+  }
 
-    //   case Status.USER_EXISTS: return {
-    //     ephemeral: true,
-    //     content: `Пользователю <@${user}> **уже запрещено** подключаться к каналу.`
-    //   }
+  @permission('mod.mutechat')
+  async mutechat(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '' } = opt as any
+    if (ctx.member.id == user || await testPermission(user, 'mod.nomutechat'))
+      return {
+        ephemeral: true,
+        content: `Вы не можете применить эту команду к данному пользоватею!`
+      }
+  }
 
-    //   default:
-    //     throw new Error(Status[status])
-    // }
+  @permission('mod.unmutechat')
+  async unmutechat(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '', reson = '' } = opt as any
+
   }
 
   async run(ctx: CommandContext) {
@@ -80,7 +157,7 @@ class Mods extends SlashCommand {
 
       throw new Error('No method!')
     } catch (e) {
-      console.error(e)
+      Logger.error(e)
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`

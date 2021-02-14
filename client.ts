@@ -1,7 +1,9 @@
 import { register, makeApi, method } from "~/lib/rpcapi";
+import { Logger } from "~/lib/logger";
+
 const test = (name: string) => {
   return (...args) => {
-    console.log(name, args)
+    Logger.log(name, args)
   }
 }
 
@@ -17,5 +19,5 @@ const api = new Test()
 makeApi(Test)
 
 api.method(3, 1)
-  .then(console.log)
-  .catch(console.error)
+  .then(Logger.log)
+  .catch(e => Logger.error(e))

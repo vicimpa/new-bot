@@ -4,6 +4,7 @@ permissions:
 
   moder:
     - '-social'
+    - '-prorole.all'
     - '*'
 
   checker:
@@ -26,6 +27,7 @@ permissions:
     # - 'social.*'
 
   user: 
+    - 'report.base'
     - 'generator.*'
     - 'voice.block'
     - 'voice.blocklist'

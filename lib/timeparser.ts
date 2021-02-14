@@ -1,4 +1,4 @@
-import { MyDate } from "./mydate"
+import { MyDate } from "./mydate";
 
 export const timeparser = (string = '') => {
   const date = new MyDate(0)

@@ -1,10 +1,21 @@
 import mongoose from "mongoose";
 import { mongoUrl } from "~/config";
-import { functions } from "~/lib/main";
+import { append } from "~/lib/main";
 import { model, SchemaDefinitionProperty } from "mongoose";
 import { SchemaPostOptions, SchemaPreOptions } from "mongoose";
 import { DocumentDefinition, Model, Schema, Document } from "mongoose";
 import { MongooseQueryMiddleware, MongooseDocumentMiddleware } from "mongoose";
+import { Logger } from "~/lib/logger";
+
+append(function mongooseConnect() {
+  mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }, (err) => {
+    if (err) Logger.error(err)
+    else Logger.log('Mongoose connect')
+  })
+}) 
 
 type Middle = 'aggregate' |
   'insertMany' |
@@ -119,13 +130,3 @@ export function makeModel<T extends Base, V extends typeof Base>(base: (new (...
 
 export { mongoose }
 export default mongoose
-
-functions.push(() => {
-  mongoose.connect(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }, (err) => {
-    if (err) console.error(err)
-    else console.log('Mongoose connect')
-  })
-}) 

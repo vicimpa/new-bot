@@ -13,6 +13,7 @@ import {
 } from "~/lib/permissions";
 import { RolesApi } from "~/services/roles";
 import { ApiSender } from "~/services/sender";
+import { Logger } from "~/lib/logger";
 
 const api = new RolesApi()
 const sender = new ApiSender()
@@ -80,10 +81,10 @@ class Prorole extends SlashCommand {
       content: `Вы не можете выдать эту роль!`
     }
 
-    const can = await api.canCheck(ctx.member.roles.join('|'), role)
+    const can = await api.canCheck(ctx.member.roles, role)
     const can2 = await testPermission(ctx.member.id, 'prorole.all')
 
-    console.log(can, can2)
+    Logger.log(can, can2)
 
     if(!can && !can2) return {
       ephemeral: true,
@@ -96,7 +97,7 @@ class Prorole extends SlashCommand {
     switch(status) {
       case Status.OK: {
         sender.proRole(ctx.member.id, userId, roleId, type == 'append')
-          .catch(console.error)
+          .catch(e => Logger.error(e))
           
         return {
           ephemeral: true,
@@ -123,7 +124,7 @@ class Prorole extends SlashCommand {
 
     return this.pro(ctx, options)
       .catch(e => {
-        console.log(e)
+        Logger.error(e)
         return {
           ephemeral: true,
           content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`

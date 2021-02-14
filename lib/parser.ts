@@ -1,5 +1,5 @@
-import { json } from "body-parser"
-import { Request } from "express"
+import { json } from "body-parser";
+import { Request } from "express";
 
 export const parser = () => 
   (req: Request & { rawBody: string }, res, next) => {

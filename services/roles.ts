@@ -4,10 +4,10 @@ import { GuildMember, Role, TextChannel, User } from "discord.js";
 import { guildId, rolesChannel } from "~/config";
 import { client } from "~/lib/commands";
 import { main } from "~/lib/main";
-import { makeRunner } from "~/lib/cote";
 import { ProroleModel } from "~/models/Prorole";
 import { register, method, makeApi } from "~/lib/rpcapi";
 import { osRoles, specificRoles, languageRoles } from "~/roles.json";
+import { Logger } from "~/lib/logger";
 
 const rolesStore = [
   ...osRoles.roles,
@@ -32,8 +32,7 @@ enum Status {
 @register()
 export class RolesApi {
   @method()
-  async canCheck(rolesString: string, role: string) {
-    const roles = rolesString.split('|')
+  async canCheck(roles: string[], role: string) {
     const can = rolesStore.filter(e => e.checkRole && roles.indexOf(e.checkRole.id) != -1)
     return !!can.find(e => e.emoji == role)
   }
@@ -114,13 +113,13 @@ async function chechUser(user: GuildMember, react: string, check = true) {
   if (!role && !alterRole) return null
 
   if (!user.roles.cache.has(role.id) && check)
-    user.roles.add(role).catch(console.error)
+    user.roles.add(role).catch(e => Logger.error(e))
 
   if (alterRole && alterRole.id !== role.id && user.roles.cache.has(alterRole.id))
-    user.roles.remove(alterRole).catch(console.error)
+    user.roles.remove(alterRole).catch(e => Logger.error(e))
 
   if (user.roles.cache.has(role.id) && !check)
-    user.roles.remove(role).catch(console.error)
+    user.roles.remove(role).catch(e => Logger.error(e))
 }
 
 async function check() {
@@ -152,7 +151,7 @@ async function check() {
     }
   }
 
-  console.log('Check complate')
+  Logger.log('Check complate')
 }
 
 async function loadRoles() {
@@ -173,9 +172,9 @@ main(__filename, async () => {
   client.on('ready', () => {
     Promise.resolve()
       .then(loadRoles)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
       .then(check)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 
   client.on('messageReactionAdd', (e, u) => {
@@ -186,7 +185,7 @@ main(__filename, async () => {
       return null
 
     chechUser(guild.member(u as User), e.emoji.name, true)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 
   client.on('messageReactionRemove', (e, u) => {
@@ -201,6 +200,6 @@ main(__filename, async () => {
         guild.member(u as User),
         e.emoji.name, false
       ))
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 })

@@ -1,15 +1,16 @@
-import genName from "@vicimpa/nick-name"
-import { guildId } from "~/config"
-import { password } from "~/lib/password"
-import { rand } from "~/lib/rand"
+import genName from "@vicimpa/nick-name";
+import { guildId } from "~/config";
+import { password } from "~/lib/password";
+import { rand } from "~/lib/rand";
 import { 
   SlashCommand, 
   CommandOptionType, 
   CommandContext, 
   ConvertedOption, 
   SlashCreator 
-} from "slash-create"
-import { permission, testPermission } from "~/lib/permissions"
+} from "slash-create";
+import { permission } from "~/lib/permissions";
+import { Logger } from "~/lib/logger";
 
 const {
   INTEGER: Int,
@@ -151,7 +152,7 @@ class Generator extends SlashCommand {
 
       throw new Error('No method!')
     } catch (e) {
-      console.error(e)
+      Logger.error(e)
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`

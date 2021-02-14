@@ -8,9 +8,8 @@ import {
   MonitoringTool,
   Sockend,
   Subscriber
-} from "cote"
-
-import { getName } from "~/lib/main";
+} from "cote";
+import { Logger } from "~/lib/logger";
 
 export {
   Requester,
@@ -59,7 +58,7 @@ export function makeRunner<T extends Base>(root: T) {
   const res = state.res || (state.res = new Responder({ name: name+'Res', key: name+'Res', respondsTo: [name+'Req'] }))
 
   for (let key of keys) {
-    console.log([name, key].join('.'))
+    Logger.log([name, key].join('.'))
     res.on([name, key].join('.'), (event, callback) => {
       root[key](...(typeof event['args'] == 'undefined' ? [] : event['args']))
         .then(result => callback(null, {result}))

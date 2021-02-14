@@ -1,5 +1,6 @@
 import { Client, TextChannel } from "discord.js";
 import { logs } from "~/config";
+import { Logger } from "~/lib/logger";
 
 class Base { }
 
@@ -36,7 +37,7 @@ export function logToRoom(keys: Room | Room[]) {
                 const result = await fun(...args)
                 return channel.send(result)
               })
-              .catch(e => console.error)
+              .catch(e => Logger.error(e))
           }
         }
       }

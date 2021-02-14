@@ -6,7 +6,8 @@ import {
   CommandContext, 
   ConvertedOption
 } from "slash-create"
-import { permission } from "../lib/permissions"
+import { permission } from "~/lib/permissions"
+import { Logger } from "~/lib/logger";
 
 const {
   INTEGER: Int,
@@ -44,7 +45,7 @@ class Social extends SlashCommand {
   async say(ctx: CommandContext, opt: ConvertedOption) {
     const {message = '0-0'} = opt as any
     
-    console.log(`Author message: ${ctx.member.displayName}`)
+    Logger.log(`Author message: ${ctx.member.displayName}`)
 
     if (message.length < 1 || message.length > 1500)
       return {
@@ -68,7 +69,7 @@ class Social extends SlashCommand {
 
       throw new Error('No method!')
     } catch (e) {
-      console.error(e)
+      Logger.error(e)
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`

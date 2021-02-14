@@ -1,4 +1,4 @@
-import { Guild, GuildMember } from "discord.js";
+// import { Guild, GuildMember } from "discord.js";
 import yaml from "yaml";
 import { client } from "~/lib/commands"
 import { readFile } from "fs/promises";
@@ -6,6 +6,7 @@ import { join } from "path";
 import { main } from "./main";
 import { guildId } from "../config";
 import { CommandContext, SlashCommand } from "slash-create";
+import { Logger } from "~/lib/logger";
 
 interface IData {
   permissions: {
@@ -64,7 +65,7 @@ export async function testPermission(userId: string, permission: string) {
 
     return !!me.find(e => can.indexOf(e) != -1)
   } catch (e) {
-    console.log(e)
+    Logger.log(e)
     return false
   }
 }
@@ -88,6 +89,6 @@ export const permission = (permission: string) => {
 
 main(__filename, () => {
   testPermission('658403244749488177', 'generator.nick')
-    .then(console.log)
-    .catch(console.error)
+    .then(Logger.log)
+    .catch(e => Logger.error(e))
 })

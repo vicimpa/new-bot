@@ -5,6 +5,7 @@ import { guildId } from "~/config";
 import { GuildMember } from "discord.js";
 import { StoreModel } from "~/models/Store";
 import { main } from "~/lib/main";
+import { Logger } from "~/lib/logger";
  
 export async function restore(member: GuildMember) {
   const guild = await client.guilds.fetch(guildId)
@@ -32,11 +33,11 @@ main(__filename, () => {
   client.on('guildMemberAdd', (e) => {
     restore(e)
       .then(() => StoreModel.clear(e.id))
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
   
   client.on('guildMemberRemove', (e) => {
     StoreModel.stored(e.id, e.nickname, e.roles.cache.map(e => e.id))
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 })

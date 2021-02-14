@@ -1,5 +1,5 @@
-import nacl from "tweetnacl"
-import { Request } from "express"
+import nacl from "tweetnacl";
+import { Request } from "express";
 
 export const access = (publicKey: string) =>
   (req: Request & { rawBody: string }, res, next) => {

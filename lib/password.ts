@@ -1,4 +1,4 @@
-import { rand } from "./rand"
+import { rand } from "./rand";
 
 const ranges = ['0-9', 'a-z', 'A-Z']
 const symbols: string[] = []

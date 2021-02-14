@@ -4,6 +4,7 @@ import { GuildMember, VoiceChannel } from "discord.js";
 import { guildId } from "~/config";
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
+import { Logger } from "~/lib/logger";
 
 async function checkVoice(voice: VoiceChannel) {
   if (!voice) return
@@ -13,7 +14,6 @@ async function checkVoice(voice: VoiceChannel) {
 
 async function checkMember(voice: VoiceChannel, member: GuildMember) {
   if (!voice) return
-  if (member.roles.cache.find(e => e.name == 'Moderator')) return
   const isConnect = voice.permissionsFor(member).has('CONNECT')
   const isSpeak = voice.permissionsFor(member).has('SPEAK')
 
@@ -36,23 +36,23 @@ main(__filename, () => {
       .then(e => e.filter(e => e instanceof VoiceChannel))
       .then(e => e.map(checkVoice))
       .then(e => Promise.all(e))
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 
   client.on('voiceStateUpdate', (_, { channel, member }) => {
     checkMember(channel, member)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 
   client.on('guildMemberUpdate', (_, post) => {
     if (!post.voice.channel) return
     checkMember(post.voice.channel, post)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 
   client.on('channelUpdate', (_, post) => {
     if (!(post instanceof VoiceChannel)) return
     checkVoice(post)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   })
 })

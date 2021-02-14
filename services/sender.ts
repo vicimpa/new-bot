@@ -1,9 +1,9 @@
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
-import { makeRunner } from "~/lib/cote";
 import { logToRoom, makeLogs } from "~/lib/makelog";
 import { MessageOptions } from "discord.js";
 import { makeApi, method, register } from "~/lib/rpcapi";
+import { Logger } from "~/lib/logger";
 
 @register()
 export class ApiSender {
@@ -12,7 +12,19 @@ export class ApiSender {
   }
 
   async donateSend(userId: string, roleId: string, time?: Date) {
-    console.log(userId, roleId, time)
+    Logger.log(userId, roleId, time)
+  }
+
+  @method()
+  @logToRoom('report')
+  async report(reportId: string, userId: string, reportedId: string, message: string) {
+    return {
+      content: `**[report:${reportId}]**`,
+      embed: {
+        color: '#ff0000',
+        description: `Пользователь <@${userId}> оправил на <@${reportedId}> жалобу с текстом: \`\`\`${message}\`\`\``
+      }
+    } as MessageOptions
   }
 
   @method()
@@ -54,7 +66,7 @@ export class ApiSender {
   @method()
   @logToRoom('voice')
   async privateBlockeSend(userId: string, set = false, limitId: string = null) {
-    let action = set ? 'заблокирова' : 'разблокировал'
+    let action = set ? 'заблокировал' : 'разблокировал'
     let target = limitId ? `пользователя <@${limitId}>` : 'всех пользователей'
     return {
       embed: {

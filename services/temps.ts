@@ -6,8 +6,12 @@ import { client } from "~/lib/control";
 import { delay } from "~/lib/delay";
 import { guildId } from "~/config";
 import { main } from "~/lib/main";
+import { register } from "~/lib/rpcapi";
+import { Logger } from "~/lib/logger";
 
+@register()
 export class TempRoles {
+
   async appendRole(userId: string, roleId: string, time?: string) {
     const guild = await client.guilds.fetch(guildId)
     const role = await guild.roles.fetch(roleId)
@@ -15,7 +19,7 @@ export class TempRoles {
 
     await TempModel.appendRole(userId, roleId, time)
     await member.roles.add(role)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   }
 
   async removeRole(userId: string, roleId: string) {
@@ -33,13 +37,13 @@ async function tick() {
 
     if (memberRole) {
       await member.roles.remove(memberRole)
-        .catch(console.error)
+        .catch(e => Logger.error(e))
     }
 
     await StoreModel.delRole(role.userId, role.roleId)
-      .catch(console.error)
+      .catch(e => Logger.error(e))
     await role.remove()
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   }
 
   await delay(1000)

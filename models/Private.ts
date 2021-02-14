@@ -1,4 +1,5 @@
 import { schema, field, Base, makeModel, method } from "~/lib/mongoose";
+import { Logger } from "~/lib/logger";
 
 @schema()
 class Private extends Base {
@@ -38,7 +39,7 @@ export class PrivateModel extends makeModel(Private) {
   ) {
     const find = await this.findOne({ _id }) || new this({ _id })
     find.updateProps({ name, limit, blocks, mutes })
-    await find.save().catch(console.error)
+    await find.save().catch(e => Logger.error(e))
   }
 
   static async get(_id: string) {

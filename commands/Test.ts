@@ -3,12 +3,12 @@ import {
   SlashCommand,
   CommandOptionType,
   CommandContext,
-  ConvertedOption,
   SlashCreator
 } from "slash-create";
 
 import { permission } from "~/lib/permissions";
 import { ApiSender } from "~/services/sender";
+import { Logger } from "~/lib/logger";
 
 const api = new ApiSender()
 
@@ -35,11 +35,11 @@ class Test extends SlashCommand {
     const { options } = ctx
     try {
       await api.testSend('658403244749488177')
-        .then(console.log)
-        .catch(console.log)
+        .then(Logger.log)
+        .catch(e => Logger.error(e))
 
     }catch(e) {
-      console.log(e)
+      Logger.error(e)
     }
     
     return {

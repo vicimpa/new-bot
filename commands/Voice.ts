@@ -24,8 +24,8 @@ import {
 } from "slash-create";
 import { permission, testPermission } from "~/lib/permissions";
 import { VoiceApi } from "~/services/private";
-import { makeRequester } from "~/lib/cote";
 import { ApiSender } from "~/services/sender";
+import { Logger } from "~/lib/logger";
 
 const { Status, Action } = VoiceApi
 const api = new VoiceApi()
@@ -155,7 +155,7 @@ class Voice extends SlashCommand {
   @permission('voice.block')
   async block(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '' } = opt as any
-    if (ctx.member.id == user || await testPermission(user, 'voice.no.block'))
+    if (ctx.member.id == user || await testPermission(user, 'voice.notblock'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользователю!`
@@ -167,7 +167,7 @@ class Voice extends SlashCommand {
     switch (status) {
       case Status.OK: {
         sender.privateBlockeSend(ctx.member.id, true, user)
-          .catch(console.log)
+          .catch(e => Logger.error(e))
 
         if(ctx.channelID == logs.voice)
           return
@@ -210,7 +210,7 @@ class Voice extends SlashCommand {
     switch (status) {
       case Status.OK: {
         sender.privateBlockeSend(ctx.member.id, false, user)
-          .catch(console.log)        
+          .catch(e => Logger.error(e))        
           
         if(ctx.channelID == logs.voice)
           return
@@ -237,7 +237,7 @@ class Voice extends SlashCommand {
     switch (status) {
       case Status.OK: {
         sender.privateBlockeSend(ctx.member.id, false)
-          .catch(console.log)
+          .catch(e => Logger.error(e))
 
         if(ctx.channelID == logs.voice)
           return
@@ -263,7 +263,7 @@ class Voice extends SlashCommand {
   @permission('voice.mute')
   async mute(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '' } = opt as any
-    if (ctx.member.id == user || await testPermission(user, 'voice.no.mute'))
+    if (ctx.member.id == user || await testPermission(user, 'voice.notmute'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользователю!`
@@ -274,7 +274,7 @@ class Voice extends SlashCommand {
     switch (status) {
       case Status.OK: {
         sender.privateMuteSend(ctx.member.id, true, user)
-          .catch(console.log)
+          .catch(e => Logger.error(e))
 
 
         if(ctx.channelID == logs.voice)
@@ -319,7 +319,7 @@ class Voice extends SlashCommand {
     switch (status) {
       case Status.OK: {
         sender.privateMuteSend(ctx.member.id, false, user)
-          .catch(console.log)
+          .catch(e => Logger.error(e))
 
         if(ctx.channelID == logs.voice)
           return
@@ -348,7 +348,7 @@ class Voice extends SlashCommand {
     switch (status) {
       case Status.OK: {
         sender.privateMuteSend(ctx.member.id, false)
-          .catch(console.log)
+          .catch(e => Logger.error(e))
         
         if(ctx.channelID == logs.voice)
           return
@@ -438,7 +438,7 @@ class Voice extends SlashCommand {
 
       throw new Error('No method!')
     } catch (e) {
-      console.error(e)
+      Logger.error(e)
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`

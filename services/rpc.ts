@@ -3,6 +3,7 @@ import SocketIO from "socket.io";
 
 import { Server } from "http";
 import { main } from "~/lib/main";
+import { Logger } from "~/lib/logger";
 
 const server = new Server()
 const socketServer = SocketIO(server)
@@ -15,21 +16,21 @@ main(__filename, () => {
     const methods: string[] = socket['_methods'] || (socket['_methods'] = [])
 
     if(sockets.indexOf(socket) == -1) sockets.push(socket)
-    console.log('New client', sockets.length)
+    Logger.log((`Update clients +1 (${sockets.length})`))
 
     socket.on('register', (name: string) => {
       if(methods.indexOf(name) == -1) methods.push(name)
-      console.log('register '+name)
+      Logger.log('register '+name)
     })
 
     socket.on('request', ({name, args}, callback) => {
-      console.log('request '+name)
+      Logger.log('request '+name)
       let a = setTimeout(callback, 2000, {error: 'Error timeout'})
 
       for(let f of sockets) {
         if(f['_methods'].indexOf(name) != -1) {
           f.emit('response', {name, args}, (...args) => {
-            console.log('response '+name)
+            Logger.log('response '+name)
             clearTimeout(a)
             callback(...args)
           })
@@ -42,12 +43,12 @@ main(__filename, () => {
     socket.on('disconnect', () => {
       let index = sockets.indexOf(socket)
       if(index != -1) sockets.splice(index, 1)
-      console.log('Leave client', sockets.length)
+      Logger.log((`Update clients -1 (${sockets.length})`))
     })
   })
 
   server.listen(rpcPort, rpcHost)
 
   server.on('listening', () =>
-    console.log('RPC Server start'))
+    Logger.log('RPC Server start'))
 })

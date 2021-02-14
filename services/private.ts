@@ -6,9 +6,9 @@ import { CategoryChannel, Guild, GuildMember, Permissions } from "discord.js";
 import { VoiceChannel, Role, PermissionString, PermissionOverwrites } from "discord.js";
 import { createdName, guildId, privates, removePrivateAfter, blockLimit } from "~/config";
 import { delay } from "~/lib/delay";
-import { makeRunner } from "~/lib/cote";
 import { PrivateModel } from "~/models/Private";
 import { register, makeApi, method } from "~/lib/rpcapi";
+import { Logger } from "~/lib/logger";
 
 const groups: RoomsStore[] = []
 
@@ -260,7 +260,7 @@ class RoomsStore {
 
     for (let [, member] of this.create.members)
       this.join(member, this.create)
-        .catch(console.error)
+        .catch(e => Logger.error(e))
 
     for (let [id, channel] of channels) {
       if (channel instanceof VoiceChannel)
@@ -375,7 +375,7 @@ class RoomsStore {
     this.voices.splice(index, 1)
     if (await voice.isRemoved()) return
     if (voice.channel) voice.channel.delete()
-      .catch(console.error)
+      .catch(e => Logger.error(e))
   }
 
   static async loadInforoom(member: GuildMember) {
@@ -416,7 +416,7 @@ async function tick() {
         continue
 
       if (!voices.find(e => e.channel.id == channel.id))
-        channel.delete().catch(console.error)
+        channel.delete().catch(e => Logger.error(e))
     }
   }
 
@@ -442,10 +442,10 @@ main(__filename, () => {
     client.guilds.fetch(guildId)
       .then(e => e.members.fetch())
       .then(e => RoomsStore.load())
-      .then(() => console.log('Loaded rooms'))
-      .catch(console.error)
+      .then(() => Logger.log('Loaded rooms'))
+      .catch(e => Logger.error(e))
 
-    tick().catch(console.error)
+    tick().catch(e => Logger.error(e))
   })
 
   client.on('channelDelete', (channel) => {
@@ -456,7 +456,7 @@ main(__filename, () => {
       e.voices.find(e =>
         (voice = e).channel.id == channel.id))
     if (!group || !voice) return
-    group.remove(voice).catch(console.error)
+    group.remove(voice).catch(e => Logger.error(e))
   })
 
   client.on('voiceStateUpdate', ({ channel, member }, _) => {
@@ -466,7 +466,7 @@ main(__filename, () => {
 
     if (!store) return
 
-    store.leave(member, channel).catch(console.error)
+    store.leave(member, channel).catch(e => Logger.error(e))
   })
 
   client.on('voiceStateUpdate', (_, { channel, member }) => {
@@ -476,7 +476,7 @@ main(__filename, () => {
 
     if (!store) return
 
-    store.join(member, channel).catch(console.error)
+    store.join(member, channel).catch(e => Logger.error(e))
   })
 
   client.on('channelUpdate', (channel) => {
@@ -501,6 +501,6 @@ main(__filename, () => {
 
     if (voice.owner)
       PrivateModel.updatePrivate(voice.owner.id, { name, limit, blocks, mutes })
-        .catch(console.error)
+        .catch(e => Logger.error(e))
   })
 })

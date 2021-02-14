@@ -1,15 +1,17 @@
-import { ENGINE_METHOD_DIGESTS } from "constants";
 import io from "socket.io-client";
 import { rpcHost, rpcPort } from "~/config";
+import { append } from "~/lib/main";
 
 const socket = io(`http://${rpcHost}:${rpcPort}`)
 const methods: string[] = []
 const runners = []
 
-socket.on('connect', () => {
-  for (let m of methods)
-    socket.emit('register', m)
-})  
+append(function rpcConnect() {
+  socket.on('connect', () => {
+    for (let m of methods)
+      socket.emit('register', m)
+  })  
+})
 
 socket.on('response', ({name, args = []}, callback) => {
   if(methods.indexOf(name) == -1) return callback({error: '1 No find method ' + name})

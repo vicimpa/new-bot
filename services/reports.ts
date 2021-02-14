@@ -117,7 +117,7 @@ async function addReaction(msg: MessageReaction, user: User) {
           rep.userId, 
           `[report:${id}]`,
           `Ваша жалоба на <@${rep.reportedId}> **отклонена** модератором <@${user.id}>.`, 
-          '#00ff00'
+          '#ff0000'
         )
     } break
 

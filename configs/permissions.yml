@@ -3,6 +3,8 @@ permissions:
     - '*'
 
   moder:
+    # - '-report.moder'
+    - '-report.base'
     - '-social'
     - '-prorole.all'
     - '*'

@@ -19,7 +19,7 @@ export class ApiSender {
   @logToRoom('report')
   async report(reportId: string, userId: string, reportedId: string, message: string) {
     return {
-      content: `**[report:${reportId}]**`,
+      content: `**[report:${reportId}]** @here`,
       embed: {
         color: '#ff0000',
         description: `Пользователь <@${userId}> оправил на <@${reportedId}> жалобу с текстом: \`\`\`${message}\`\`\``

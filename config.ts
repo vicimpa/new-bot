@@ -38,6 +38,9 @@ export const blockLimit = 30
 export const rpcHost = '127.0.0.1'
 export const rpcPort = 2525
 
+export const webHost = '127.0.0.1'
+export const webPort = 4001
+
 export const mongoUrl = 'mongodb://localhost:27017/howdycord'
 
 export const bots = {

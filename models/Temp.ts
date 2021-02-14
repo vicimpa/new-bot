@@ -15,6 +15,9 @@ class Temp extends Base {
   @field({ type: Date, default: Date.now })
   endTime: Date
 
+  @field({ type: Boolean, default: false})
+  inUser: boolean
+
   @field({ type: Date })
   updateTime: Date
 
@@ -42,7 +45,7 @@ class Temp extends Base {
 
 export class TempModel extends makeModel(Temp) {
   static async findLose() {
-    return this.find({ endTime: { $lte: new Date() } })
+    return this.find({ endTime: { $lte: new Date() }, onUser: true })
   }
 
   static async createRole(userId: string, roleId: string) {

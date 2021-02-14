@@ -2,6 +2,9 @@ permissions:
   admin:
     - '*'
 
+  allchecker:
+    - 'prorole.all'
+
   moder:
     # - '-report.moder'
     - '-report.base'
@@ -96,3 +99,6 @@ groups:
 
   tester:
     # - '694055134166253588' # Yetoll
+  
+  allchecker:
+    - '590941225096314880'   # Lokilife

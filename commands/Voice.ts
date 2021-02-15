@@ -1,19 +1,3 @@
-/**
- *  /voice block @user
- *  /voice unblock @user
- *  /voice unblockall
- *
- *  /voice mute @user
- *  /voice unmute @user
- *  /voice unmuteall
- *
- *  /voice mutelist @page
- *  /voice blocklist @page
- *
- *  /voice set name @name
- *  /voice set limit @limit 
- */
-
 import { guildId, logs } from "~/config"
 import {
   SlashCommand,

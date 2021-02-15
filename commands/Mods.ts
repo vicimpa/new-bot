@@ -7,7 +7,7 @@ import {
   SlashCreator
 } from "slash-create";
 import { permission, testPermission } from "~/lib/permissions";
-import { Logger } from "../lib/logger";
+import { Logger } from "~/lib/logger";
 
 const {
   INTEGER: Int,

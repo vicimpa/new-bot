@@ -7,7 +7,7 @@ import {
   ConvertedOption
 } from "slash-create"
 import { permission } from "~/lib/permissions"
-import { Logger } from "../lib/logger"
+import { Logger } from "~/lib/logger"
 
 const {
   INTEGER: Int,

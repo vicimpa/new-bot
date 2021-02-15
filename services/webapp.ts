@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/public', express.static(join(process.cwd(), 'public')))
+app.use('/node_modules', express.static(join(process.cwd(), 'node_modules')))
 
 main(__filename, () => {
   app.listen(webPort, webHost, () =>

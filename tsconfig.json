@@ -4,6 +4,8 @@
     "module": "CommonJS",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "sourceMap": true
   }
 }

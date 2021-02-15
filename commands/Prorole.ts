@@ -6,7 +6,6 @@ import {
   ConvertedOption,
   SlashCreator
 } from "slash-create";
-import { makeRequester } from "~/lib/cote";
 import {
   permission,
   testPermission

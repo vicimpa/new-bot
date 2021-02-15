@@ -6,7 +6,7 @@ const node_env = process.env.NODE_ENV || ''
 const devMode = node_env.toLowerCase() != 'production'
 
 const ext = (callback: () => any) => {
-  return 'eval(' + callback.toString()+'())' 
+  return 'eval((' + callback.toString()+')())' 
 }
 
 export = {
@@ -19,6 +19,7 @@ export = {
   resolve: { extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'] },
   mode: devMode ? 'development' : 'production',
   watch: devMode,
+  devtool: devMode ? 'source-map' : 'nonde',
   module: {
     rules: [
       {
@@ -32,6 +33,10 @@ export = {
           'css-loader',
           'sass-loader'
         ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg|ttf|woff|eot|woff2)$/,
+        loader: 'file-loader'
       }
     ]
   },

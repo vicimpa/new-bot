@@ -68,6 +68,8 @@ class Mods extends SlashCommand {
             }
           ]
         },
+
+
         {
           type: Sub,
           name: 'mutechat',
@@ -109,6 +111,25 @@ class Mods extends SlashCommand {
               description: 'Причина разблокировки'
             }
           ]
+        },
+
+        {
+          type: Sub,
+          name: 'clear',
+          description: 'Очистить чат',
+          options: [
+            {
+              type: Int,
+              name: 'count',
+              required: true,
+              description: 'Количество удаляемых сообщений'
+            },
+            {
+              type: User,
+              name: 'user',
+              description: 'Пользователь, чьи сообщения нужно удалить.'
+            }
+          ]
         }
       ]
     })
@@ -122,12 +143,22 @@ class Mods extends SlashCommand {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
+
+    return {
+      ephemeral: true,
+      content: `Команда пока не готова!`
+    }
   }
 
   @permission('mod.unmutevoice')
   async unmutevoice(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '', reson = '' } = opt as any
 
+
+    return {
+      ephemeral: true,
+      content: `Команда пока не готова!`
+    }
   }
 
   @permission('mod.mutechat')
@@ -138,12 +169,31 @@ class Mods extends SlashCommand {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
+
+    return {
+      ephemeral: true,
+      content: `Команда пока не готова!`
+    }
   }
 
   @permission('mod.unmutechat')
   async unmutechat(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '', count = 0 } = opt as any
+
+    return {
+      ephemeral: true,
+      content: `Команда пока не готова!`
+    }
+  }
+
+  @permission('mod.clear')
+  async clear(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '', reson = '' } = opt as any
 
+    return {
+      ephemeral: true,
+      content: `Команда пока не готова!`
+    }
   }
 
   async run(ctx: CommandContext) {
@@ -166,4 +216,4 @@ class Mods extends SlashCommand {
   }
 }
 
-// export = Mods
+export = Mods

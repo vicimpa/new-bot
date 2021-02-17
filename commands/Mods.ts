@@ -178,7 +178,7 @@ class Mods extends SlashCommand {
 
   @permission('mod.unmutechat')
   async unmutechat(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', count = 0 } = opt as any
+    const { user = '', reson = '' } = opt as any
 
     return {
       ephemeral: true,
@@ -188,7 +188,7 @@ class Mods extends SlashCommand {
 
   @permission('mod.clear')
   async clear(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reson = '' } = opt as any
+    const { user = '', count = 0 } = opt as any
 
     return {
       ephemeral: true,

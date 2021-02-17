@@ -9,6 +9,7 @@ import { register, method, makeApi } from "~/lib/rpcapi";
 import { osRoles, specificRoles, languageRoles } from "~/roles.json";
 import { Logger } from "~/lib/logger";
 
+
 const rolesStore = [
   ...osRoles.roles,
   ...specificRoles.roles,
@@ -168,7 +169,7 @@ async function loadRoles() {
 main(__filename, async () => {
   const guild = await client.guilds.fetch(guildId)
   makeApi(RolesApi)
-
+  
   client.on('ready', () => {
     Promise.resolve()
       .then(loadRoles)

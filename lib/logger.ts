@@ -26,13 +26,13 @@ const con = new Console(out, err)
 
 out.write = (c, cb) => {
   if (typeof c == 'string')
-    console.log(c)
+    console.log(c.trim())
   return false
 }
 
 err.write = (c, cb) => {
   if (typeof c == 'string')
-    console.error(c)
+    console.error(c.trim())
   return false
 }
 

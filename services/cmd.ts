@@ -28,7 +28,6 @@ const creator = new SlashCreator({
 })
 
 app.disabled('x-powered-by')
-app.use(baseRoute, router)
 
 router
   .use(logger())

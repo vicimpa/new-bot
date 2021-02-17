@@ -30,7 +30,7 @@ export const commandsPath = {
   filter: /^([^\.].*)\.ts$/
 }
 
-export const baseRoute = '/bot'
+export const baseRoute = '/'
 export const httpPort = 4000
 export const httpHost = '127.0.0.1'
 export const blockLimit = 30

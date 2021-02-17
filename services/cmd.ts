@@ -15,7 +15,6 @@ import { parser } from "~/lib/parser";
 import { logger } from "~/lib/logger";
 import { exrouter } from "~/lib/exrouter";
 import { main } from "~/lib/main";
-import { client } from "~/lib/commands";
 import { Logger } from "~/lib/logger";
 
 const app = express()
@@ -28,6 +27,7 @@ const creator = new SlashCreator({
 })
 
 app.disabled('x-powered-by')
+app.use(baseRoute, router)
 
 router
   .use(logger())
@@ -35,7 +35,6 @@ router
   .use(access(bots.cmd.public))
 
 main(__filename, () => {
-  client
   creator
     .withServer(exrouter(router))
     .registerCommandsIn(commandsPath)

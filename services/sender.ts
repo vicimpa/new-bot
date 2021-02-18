@@ -4,7 +4,9 @@ import { logToRoom, makeLogs } from "~/lib/makelog";
 import { MessageOptions } from "discord.js";
 import { makeApi, method, register } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
-import { TempRoles } from "./temps";
+import { tempModelEvents } from "~/models/Temp";
+import { mutes } from "../config";
+import { remaining } from "../lib/remaining";
 
 @register()
 export class ApiSender {
@@ -16,26 +18,67 @@ export class ApiSender {
     Logger.log(userId, roleId, time)
   }
 
-  @method()
-  @logToRoom(['admin', 'jail'])
-  async mute(moder: string, user: string, reson: string, time: Date) {
-    return {
-      content: `**Mute**`,
-      embed: {
-        color: '#ff0000',
-        description: `Модератор <@${moder}> замьютил в чатах <@${user}> до ${time} по причине: \`\`\`${reson}\`\`\``
-      }
-    } as MessageOptions
-  }
+  @logToRoom(['jail'])
+  async muteChange(
+    mode: 'add' | 'update' | 'delete',
+    userId: string,
+    roleId: string,
+    timeEnd: number,
+    deltaTime: number,
+    moderId: string,
+    reson: string
+  ) {
 
-  @method()
-  @logToRoom(['admin', 'jail'])
-  async unmute(user: string) {
+    let description = ``
+    let big = deltaTime > 0
+
+    switch(mode) {
+      case 'add': {
+        if(moderId) {
+          description += `Модератор <@${moderId}> выдал <@&${roleId}> пользователю <@${userId}>`
+        }else {
+          description += `Пользователь <@${userId}> получил <@&${roleId}>`
+        }
+
+        if(reson) {
+          description += ` по причине \`\`\`${reson}\`\`\``
+        }
+
+        description += ` на срок ${remaining(deltaTime)}.`
+        description += `\n Mute будет снят примерно в ${new Date(timeEnd)}`
+      }; break
+
+      case 'update': {
+        if(moderId) {
+          description += `Модератор <@${moderId}> ${big? 'увеличил' : 'уменьшил'} mute чата пользователю <@${userId}>`
+        }else {
+          description += `У пользователя <@${userId}> ${big? 'увеличен' : 'уменьшен'} mute чата`
+        }
+
+        if(reson) {
+          description += ` по причине \`\`\`${reson}\`\`\``
+        }
+
+        description += ` на срок ${remaining(Math.abs(deltaTime))}.`
+        description += `\n Mute будет снят примерно в ${new Date(timeEnd)}`
+      }; break
+
+      case 'delete': {
+        if(!moderId)
+          description += `Закончился срок <@&${roleId}> у пользователя <@${userId}>`
+        else
+          description += `Модератор <@${moderId}> снял <@&${roleId}> пользователю <@${userId}>`
+
+        if(reson) {
+          description += ` по причине \`\`\`${reson}\`\`\``
+        }
+      }; break
+    }
+
     return {
-      content: `**Mute**`,
       embed: {
-        color: '#ff0000',
-        description: `Пользователь <@${user}> был разамьючен в чатах <@${user}>`
+        title: '[mute]',
+        description
       }
     } as MessageOptions
   }
@@ -102,14 +145,31 @@ export class ApiSender {
   }
 }
 
-const sender = new ApiSender()
-const temps = new TempRoles()
-
-temps.on('tempChange', (type, userId, roleId) => {
-
-})
 
 main(__filename, () => {
+  const sender = new ApiSender()
+  
+  const tempRoleEvent = (mode: 'add' | 'update' | 'delete') => {
+    return ((userId: string,
+      roleId: string,
+      timeEnd: number,
+      deltaTime: number,
+      moderId: string,
+      reson: string
+    ) => {
+      if(roleId == mutes.chat) 
+        return sender.muteChange(
+          mode, userId, roleId, timeEnd, 
+          deltaTime, moderId, reson
+        ).catch(e => Logger.error(e))
+
+    }) as Parameters<(typeof tempModelEvents)['on']>[1]
+  }
+  
+  tempModelEvents.on('appendRole', tempRoleEvent('add'))
+  tempModelEvents.on('updateRole', tempRoleEvent('update'))
+  tempModelEvents.on('deleteRole', tempRoleEvent('delete'))
+
   makeApi(ApiSender)
   makeLogs(new ApiSender(), client)
 })

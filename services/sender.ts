@@ -4,6 +4,7 @@ import { logToRoom, makeLogs } from "~/lib/makelog";
 import { MessageOptions } from "discord.js";
 import { makeApi, method, register } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
+import { TempRoles } from "./temps";
 
 @register()
 export class ApiSender {
@@ -13,6 +14,30 @@ export class ApiSender {
 
   async donateSend(userId: string, roleId: string, time?: Date) {
     Logger.log(userId, roleId, time)
+  }
+
+  @method()
+  @logToRoom(['admin', 'jail'])
+  async mute(moder: string, user: string, reson: string, time: Date) {
+    return {
+      content: `**Mute**`,
+      embed: {
+        color: '#ff0000',
+        description: `Модератор <@${moder}> замьютил в чатах <@${user}> до ${time} по причине: \`\`\`${reson}\`\`\``
+      }
+    } as MessageOptions
+  }
+
+  @method()
+  @logToRoom(['admin', 'jail'])
+  async unmute(user: string) {
+    return {
+      content: `**Mute**`,
+      embed: {
+        color: '#ff0000',
+        description: `Пользователь <@${user}> был разамьючен в чатах <@${user}>`
+      }
+    } as MessageOptions
   }
 
   @method()
@@ -76,6 +101,13 @@ export class ApiSender {
     } as MessageOptions
   }
 }
+
+const sender = new ApiSender()
+const temps = new TempRoles()
+
+temps.on('tempChange', (type, userId, roleId) => {
+
+})
 
 main(__filename, () => {
   makeApi(ApiSender)

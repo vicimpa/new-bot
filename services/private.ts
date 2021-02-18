@@ -379,10 +379,13 @@ class RoomsStore {
   }
 
   static async loadInforoom(member: GuildMember) {
-    const {
-      name = member.nickname || member.user.username,
+    let {
+      name = (member.nickname || member.user.username).replace(/[^a-z0-9\s!-+`@#$%^&*()\[\]]/gi, ''),
       limit = 0, blocks = [], mutes = []
     } = await PrivateModel.get(member.id) || {}
+
+    if(!name.trim())
+      name = `Room ${member.user.discriminator}`
 
     return {
       id: member.id, name, limit, blocks, mutes

@@ -1,8 +1,8 @@
 import { MyDate } from "./mydate";
 
-export const timeparser = (string = '') => {
-  const date = new MyDate(0)
-  const regExp = /((\d+\.?\d*)\s*(h|m|s|D|M|Y))/
+export const timeparser = (string = '', d = new Date(0)) => {
+  const date = new MyDate(+d)
+  const regExp = /((-?\d+\.?\d*)\s*(h|m|s|D|M|Y))/
 
   let re: RegExpExecArray = null
 

@@ -14,6 +14,7 @@ main(__filename, () => {
 
   socketServer.on('connection', (socket) => {
     const methods: string[] = socket['_methods'] || (socket['_methods'] = [])
+    const events: string[] = socket['_events'] || (socket['_events'] = [])
 
     if(sockets.indexOf(socket) == -1) sockets.push(socket)
     Logger.log((`Update clients +1 (${sockets.length})`))
@@ -23,11 +24,25 @@ main(__filename, () => {
       Logger.log('register '+name)
     })
 
+    socket.on('subscribe', (name: string) => {
+      if(events.indexOf(name) == -1) events.push(name)
+      Logger.log('subscribe '+name)
+    })
+
+    socket.on('emit', ({name = '', args = []}) => {
+      Logger.log('RPC emit '+name, {args})
+      for(const f of sockets) {
+        if(f['_events'].indexOf(name) != -1) {
+          f.emit('event', {name, args})
+        }
+      }
+    })
+
     socket.on('request', ({name, args}, callback) => {
       Logger.log('request '+name)
-      let a = setTimeout(callback, 2000, {error: 'Error timeout'})
+      const a = setTimeout(callback, 2000, {error: 'Error timeout'})
 
-      for(let f of sockets) {
+      for(const f of sockets) {
         if(f['_methods'].indexOf(name) != -1) {
           f.emit('response', {name, args}, (...args) => {
             Logger.log('response '+name)

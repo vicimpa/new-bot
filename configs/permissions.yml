@@ -2,12 +2,8 @@ permissions:
   admin:
     - '*'
 
-  allchecker:
-    - 'prorole.all'
-
   moder:
     # - '-report.moder'
-    - '-report.base'
     - '-social'
     - '-prorole.all'
     - '*'
@@ -15,21 +11,9 @@ permissions:
   checker:
     - 'prorole.base'
 
-  tester:
-    # - 'voice.mute'
-    # - 'voice.unmute'
-    # - 'voice.mutelist'
-    # - 'voice.block'
-    # - 'voice.unblock'
-    # - 'voice.blocklist'
-
   sponsor:
-    # - 'donate.status.*'
     - 'voice.notblock'
     - 'voice.notmute'
-
-  social:
-    # - 'social.*'
 
   user: 
     - 'report.base'
@@ -96,9 +80,3 @@ groups:
 
   user:
     - '&805944675188867112' #everyone 
-
-  tester:
-    # - '694055134166253588' # Yetoll
-  
-  allchecker:
-    - '590941225096314880'   # Lokilife

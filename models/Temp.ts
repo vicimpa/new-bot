@@ -26,12 +26,12 @@ class Temp extends Base {
     let { endTime } = this
 
     if (typeof time == 'string')
-      time = timeparser(time)
+      time = timeparser(time, endTime)
 
     if (time instanceof Date)
       endTime = time
     else
-      endTime = new Date(+endTime + time)
+      endTime = new Date(+time)
 
     this.endTime = endTime
     return this
@@ -45,7 +45,11 @@ class Temp extends Base {
 
 export class TempModel extends makeModel(Temp) {
   static async findLose() {
-    return this.find({ endTime: { $lte: new Date() }, onUser: true })
+    return this.find({ endTime: { $lte: new Date() } })
+  }
+
+  static async getNew() {
+    return this.find({inUser: false, endTime: { $gte: new Date() }})
   }
 
   static async createRole(userId: string, roleId: string) {

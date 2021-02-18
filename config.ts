@@ -30,6 +30,11 @@ export const commandsPath = {
   filter: /^([^\.].*)\.ts$/
 }
 
+export const mutes = {
+  chat: '805944675243917365',
+  voice: '805944675243917366'
+}
+
 export const baseRoute = '/'
 export const httpPort = 4000
 export const httpHost = '127.0.0.1'

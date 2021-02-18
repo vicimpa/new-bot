@@ -169,7 +169,7 @@ async function loadRoles() {
 main(__filename, async () => {
   const guild = await client.guilds.fetch(guildId)
   makeApi(RolesApi)
-  
+
   client.on('ready', () => {
     Promise.resolve()
       .then(loadRoles)

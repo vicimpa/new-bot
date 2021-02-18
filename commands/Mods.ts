@@ -1,4 +1,4 @@
-import { guildId } from "~/config"
+import { guildId, mutes } from "~/config"
 import {
   SlashCommand,
   CommandOptionType,
@@ -8,6 +8,7 @@ import {
 } from "slash-create";
 import { permission, testPermission } from "~/lib/permissions";
 import { Logger } from "~/lib/logger";
+import { TempRoles } from "~/services/temps";
 
 const {
   INTEGER: Int,
@@ -15,6 +16,8 @@ const {
   USER: User,
   SUB_COMMAND: Sub
 } = CommandOptionType
+
+const api = new TempRoles()
 
 class Mods extends SlashCommand {
   filePath = __filename
@@ -46,7 +49,8 @@ class Mods extends SlashCommand {
             {
               type: Str,
               name: 'time',
-              description: 'Время блокировки (30m default)'
+              required: true,
+              description: 'Время блокировки'
             }
           ]
         },
@@ -90,7 +94,8 @@ class Mods extends SlashCommand {
             {
               type: Str,
               name: 'time',
-              description: 'Время блокировки (30m default)'
+              required: true,
+              description: 'Время блокировки'
             }
           ]
         },
@@ -113,24 +118,24 @@ class Mods extends SlashCommand {
           ]
         },
 
-        {
-          type: Sub,
-          name: 'clear',
-          description: 'Очистить чат',
-          options: [
-            {
-              type: Int,
-              name: 'count',
-              required: true,
-              description: 'Количество удаляемых сообщений'
-            },
-            {
-              type: User,
-              name: 'user',
-              description: 'Пользователь, чьи сообщения нужно удалить.'
-            }
-          ]
-        }
+        // {
+        //   type: Sub,
+        //   name: 'clear',
+        //   description: 'Очистить чат',
+        //   options: [
+        //     {
+        //       type: Int,
+        //       name: 'count',
+        //       required: true,
+        //       description: 'Количество удаляемых сообщений'
+        //     },
+        //     {
+        //       type: User,
+        //       name: 'user',
+        //       description: 'Пользователь, чьи сообщения нужно удалить.'
+        //     }
+        //   ]
+        // }
       ]
     })
   }
@@ -144,9 +149,12 @@ class Mods extends SlashCommand {
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
 
+    api.append(user, mutes.voice, time, ctx.member.id, reson)
+      .catch(e => Logger.error(e))
+
     return {
       ephemeral: true,
-      content: `Команда пока не готова!`
+      content: `Выполнено!`
     }
   }
 
@@ -155,24 +163,30 @@ class Mods extends SlashCommand {
     const { user = '', reson = '' } = opt as any
 
 
+    api.delete(user, mutes.voice, ctx.member.id, reson)
+      .catch(e => Logger.error(e))
+
     return {
       ephemeral: true,
-      content: `Команда пока не готова!`
+      content: `Выполнено!`
     }
   }
 
   @permission('mod.mutechat')
   async mutechat(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '' } = opt as any
+    const { user = '', reson = '', time = '30m' } = opt as any
     if (ctx.member.id == user || await testPermission(user, 'mod.nomutechat'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
 
+    api.append(user, mutes.chat, time, ctx.member.id, reson)
+      .catch(e => Logger.error(e))
+
     return {
       ephemeral: true,
-      content: `Команда пока не готова!`
+      content: `Выполнено!`
     }
   }
 
@@ -180,9 +194,12 @@ class Mods extends SlashCommand {
   async unmutechat(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '', reson = '' } = opt as any
 
+    api.delete(user, mutes.chat, ctx.member.id, reson)
+      .catch(e => Logger.error(e))
+
     return {
       ephemeral: true,
-      content: `Команда пока не готова!`
+      content: `Выполнено!`
     }
   }
 

@@ -52,14 +52,14 @@ class Temp extends SlashCommand {
     })
   }
 
-  @permission('test')
+  @permission('temps.role')
   async run(ctx: CommandContext) {
     const { options } = ctx
 
     const {user = '', role = '', time = ''} = options as any
 
     try {
-      api.append(user, role, time)
+      api.append(user, role, time, ctx.member.id)
         .catch(e => Logger.error(e))
     }catch(e) {
       Logger.error(e)
@@ -72,4 +72,4 @@ class Temp extends SlashCommand {
   }
 }
 
-export = Temp
+// export = Temp

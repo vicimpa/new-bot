@@ -13,22 +13,50 @@ import { GuildMember, Role } from "discord.js";
 @register()
 export class TempRoles {
   @method()
-  async append(userId: string, roleId: string, time: string) {
-    await TempModel.appendRole(userId, roleId, time)
+  async append(userId: string, roleId: string, time: string, moderId?: string, reson?: string) {
+    await TempModel.appendRole(userId, roleId, time, moderId, reson)
+  }
+
+  @method()
+  async delete(userId: string, roleId: string, moderId?: string, reson?: string) {
+    await TempModel.removeRole(userId, roleId, moderId, reson)
   }
 }
 
 async function tick() {
   const guild = await client.guilds.fetch(guildId)
-  const newRoles = await TempModel.getNew()
 
-  for(let role of newRoles) {
+  const removed = await TempModel.findRemoved()
+
+
+  for (let role of removed) {
     const member = await guild.members.fetch(role.userId)
-      .catch(e => null as GuildMember )
+      .catch(e => null as GuildMember)
     const guildRole = await guild.roles.fetch(role.roleId)
       .catch(e => null as Role)
 
-    if(!member || !guildRole) {
+    if (!member || !guildRole) {
+      await role.deleteRole(true)
+        .catch(e => null)
+
+      continue
+    }
+
+    await member.roles.remove(guildRole)
+      .then(e => role.inUser = false)
+      .then(e => role.save())
+      .catch(e => null)
+  }
+
+  const newRoles = await TempModel.getNew()
+
+  for (let role of newRoles) {
+    const member = await guild.members.fetch(role.userId)
+      .catch(e => null as GuildMember)
+    const guildRole = await guild.roles.fetch(role.roleId)
+      .catch(e => null as Role)
+
+    if (!member || !guildRole) {
       await role.deleteRole(true)
         .catch(e => null)
 
@@ -43,13 +71,13 @@ async function tick() {
 
   const loseRoles = await TempModel.findLose()
 
-  for(let role of loseRoles) {
+  for (let role of loseRoles) {
     const member = await guild.members.fetch(role.userId)
-      .catch(e => null as GuildMember )
+      .catch(e => null as GuildMember)
     const guildRole = await guild.roles.fetch(role.roleId)
       .catch(e => null as Role)
 
-    if(!member || !guildRole) {
+    if (!member || !guildRole) {
       await role.deleteRole(true)
         .catch(e => null)
         .then(e => StoreModel.delRole(role.userId, role.roleId))

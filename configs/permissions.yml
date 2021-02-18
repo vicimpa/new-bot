@@ -3,8 +3,7 @@ permissions:
     - '*'
 
   moder:
-    # - '-report.moder'
-    - '-social'
+    - '-report.moder'
     - '-prorole.all'
     - '*'
 
@@ -16,6 +15,7 @@ permissions:
     - 'voice.notmute'
 
   user: 
+    - 'user.avatar'
     - 'report.base'
     - 'generator.*'
     - 'voice.block'

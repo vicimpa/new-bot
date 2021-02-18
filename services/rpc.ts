@@ -30,7 +30,7 @@ main(__filename, () => {
     })
 
     socket.on('emit', ({name = '', args = []}) => {
-      Logger.log('RPC emit '+name, {args})
+      Logger.log('RPC emit '+name + ' args: ' + args.length)
       for(const f of sockets) {
         if(f['_events'].indexOf(name) != -1) {
           f.emit('event', {name, args})

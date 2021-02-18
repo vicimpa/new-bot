@@ -5,19 +5,11 @@ import { MessageOptions } from "discord.js";
 import { makeApi, method, register } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
 import { tempModelEvents } from "~/models/Temp";
-import { mutes } from "../config";
-import { remaining } from "../lib/remaining";
+import { mutes } from "~/config";
+import { remaining } from "~/lib/remaining";
 
 @register()
 export class ApiSender {
-  async muteSend(moderId: string, userId: string, reson: string, time?: Date) {
-
-  }
-
-  async donateSend(userId: string, roleId: string, time?: Date) {
-    Logger.log(userId, roleId, time)
-  }
-
   @logToRoom(['jail'])
   async muteChange(
     mode: 'add' | 'update' | 'delete',
@@ -34,46 +26,28 @@ export class ApiSender {
 
     switch(mode) {
       case 'add': {
-        if(moderId) {
-          description += `Модератор <@${moderId}> выдал <@&${roleId}> пользователю <@${userId}>`
-        }else {
-          description += `Пользователь <@${userId}> получил <@&${roleId}>`
-        }
-
-        if(reson) {
-          description += ` по причине \`\`\`${reson}\`\`\``
-        }
+        if(moderId) description += `<@${moderId}> выдал <@&${roleId}> пользователю <@${userId}>`
+        else description += `Пользователь <@${userId}> получил <@&${roleId}>`
 
         description += ` на срок ${remaining(deltaTime)}.`
-        description += `\n Mute будет снят примерно в ${new Date(timeEnd)}`
+        description += `\n <@&${roleId}> будет снят примерно в ${new Date(timeEnd)}`
       }; break
 
       case 'update': {
-        if(moderId) {
-          description += `Модератор <@${moderId}> ${big? 'увеличил' : 'уменьшил'} mute чата пользователю <@${userId}>`
-        }else {
-          description += `У пользователя <@${userId}> ${big? 'увеличен' : 'уменьшен'} mute чата`
-        }
-
-        if(reson) {
-          description += ` по причине \`\`\`${reson}\`\`\``
-        }
+        if(moderId) description += `<@${moderId}> ${big? 'увеличил' : 'уменьшил'} <@&${roleId}> пользователю <@${userId}>`
+        else description += `У пользователя <@${userId}> ${big? 'увеличен' : 'уменьшен'} <@&${roleId}>`
 
         description += ` на срок ${remaining(Math.abs(deltaTime))}.`
-        description += `\n Mute будет снят примерно в ${new Date(timeEnd)}`
+        description += `\n <@&${roleId}> будет снят примерно в ${new Date(timeEnd)}`
       }; break
 
       case 'delete': {
-        if(!moderId)
-          description += `Закончился срок <@&${roleId}> у пользователя <@${userId}>`
-        else
-          description += `Модератор <@${moderId}> снял <@&${roleId}> пользователю <@${userId}>`
-
-        if(reson) {
-          description += ` по причине \`\`\`${reson}\`\`\``
-        }
+        if(!moderId) description += `Закончился срок <@&${roleId}> у пользователя <@${userId}>`
+        else description += `<@${moderId}> снял <@&${roleId}> пользователю <@${userId}>`
       }; break
     }
+
+    if(reson) description += `\n\n Причина: \`\`\`${reson}\`\`\``
 
     return {
       embed: {
@@ -157,7 +131,7 @@ main(__filename, () => {
       moderId: string,
       reson: string
     ) => {
-      if(roleId == mutes.chat) 
+      if(roleId == mutes.chat || roleId == mutes.voice) 
         return sender.muteChange(
           mode, userId, roleId, timeEnd, 
           deltaTime, moderId, reson

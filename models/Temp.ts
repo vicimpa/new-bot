@@ -9,7 +9,7 @@ export const tempModelEvents = new (class TemproleEvents extends Events<{
     timeEnd: number, 
     deltaTime: number, 
     moderId: string, 
-    reson: string
+    reason: string
   ): void
 
   updateRole(
@@ -18,7 +18,7 @@ export const tempModelEvents = new (class TemproleEvents extends Events<{
     timeEnd: number, 
     deltaTime: number, 
     moderId: string, 
-    reson: string
+    reason: string
   ): void
 
   deleteRole(
@@ -27,7 +27,7 @@ export const tempModelEvents = new (class TemproleEvents extends Events<{
     timeEnd: number, 
     deltaTime: number, 
     moderId: string, 
-    reson: string
+    reason: string
   ): void
 }>{ })
 
@@ -57,14 +57,14 @@ class Temp extends Base {
   @field({ type: Object, default: {} })
   info: {
     moderId?: string
-    reson?: string
+    reason?: string
   }
 
   @field({ type: [Date], default: [] })
   appends: Date[]
 
   @method()
-  append(time: string | Date | number, moderId?: string, reson?: string) {
+  append(time: string | Date | number, moderId?: string, reason?: string) {
     let { endTime } = this
 
     this.appends.push(new Date())
@@ -82,14 +82,14 @@ class Temp extends Base {
   }
 
   @method()
-  async deleteRole(deletedUser = false, moderId?: string, reson?: string) {
+  async deleteRole(deletedUser = false, moderId?: string, reason?: string) {
     this.removed = true
 
     if (deletedUser)
       this.inUser = false
 
     const { userId, roleId } = this
-    tempModelEvents.emit('deleteRole', userId, roleId, +this.endTime, 0, moderId, reson)
+    tempModelEvents.emit('deleteRole', userId, roleId, +this.endTime, 0, moderId, reason)
     return this.save()
   }
 
@@ -117,19 +117,19 @@ export class TempModel extends makeModel(Temp) {
     roleId: string,
     time: string | Date | number,
     moderId?: string,
-    reson?: string
+    reason?: string
   ) {
     const find = await this.findOne({ removed: false, userId, roleId })
-      || new this({ userId, roleId, info: { moderId, reson } })
+      || new this({ userId, roleId, info: { moderId, reason } })
 
     const { endTime } = find
 
-    await find.append(time, moderId, reson)
+    await find.append(time, moderId, reason)
 
     const mode = find.appends.length == 1 ? 'appendRole' : 'updateRole'
 
     tempModelEvents.emit(mode, userId, roleId, +find.endTime,
-      +find.endTime - +endTime, moderId, reson)
+      +find.endTime - +endTime, moderId, reason)
 
     return find
   }
@@ -138,10 +138,10 @@ export class TempModel extends makeModel(Temp) {
     userId: string,
     roleId: string,
     moderId?: string,
-    reson?: string
+    reason?: string
   ) {
     const find = await this.findOne({ removed: false, userId, roleId })
     if (!find) return
-    return find.deleteRole(false, moderId, reson)
+    return find.deleteRole(false, moderId, reason)
   }
 }

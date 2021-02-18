@@ -1,3 +1,5 @@
+#!/usr/bin/env ts-node
+
 import { rpcHost, rpcPort } from "~/config";
 import SocketIO from "socket.io";
 

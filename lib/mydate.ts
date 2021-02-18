@@ -1,3 +1,7 @@
+import { formatDiagnostic } from "typescript"
+
+const re = /((h|m|s|D|M|Y)\2*)/g
+
 export class MyDate extends Date {
   get h() { return this.getHours() }
   set h(v) { this.setHours(v) }
@@ -16,6 +20,23 @@ export class MyDate extends Date {
   
   get Y() { return this.getFullYear() }
   set Y(v) { this.setFullYear(v) }
+
+  count(v = '', n = 2) {
+    return ('0'.repeat(n) + v).substr(-n)
+  }
+
+  format(format = '') {
+    while(true) {
+      const f = re.exec(format)
+      if(!f) return format
+      const [c, g, k] = f
+      format = format.replace(g, this.count(`${this[k]}`, g.length))
+    }
+  }
+
+  static format(d: Date | number | string, format = '') {
+    return (new this(d)).format(format)
+  }
 }
 
 export class MyUTCDate extends Date {
@@ -36,4 +57,21 @@ export class MyUTCDate extends Date {
   
   get Y() { return this.getUTCFullYear() }
   set Y(v) { this.setUTCFullYear(v) }
+
+  count(v = '', n = 2) {
+    return ('0'.repeat(n) + v).substr(-n)
+  }
+
+  format(format = '') {
+    while(true) {
+      const f = re.exec(format)
+      if(!f) return format
+      const [c, g, k] = f
+      format = format.replace(g, this.count(`${this[k]}`, g.length))
+    }
+  }
+
+  static format(d: Date | number | string, format = '') {
+    return (new this(d)).format(format)
+  }
 }

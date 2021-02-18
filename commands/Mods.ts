@@ -9,6 +9,8 @@ import {
 import { permission, testPermission } from "~/lib/permissions";
 import { Logger } from "~/lib/logger";
 import { TempRoles } from "~/services/temps";
+import { ChatControl } from "~/services/chatcontrol";
+import { ApiSender } from "~/services/sender";
 
 const {
   INTEGER: Int,
@@ -18,6 +20,8 @@ const {
 } = CommandOptionType
 
 const api = new TempRoles()
+const sender = new ApiSender()
+const chat = new ChatControl()
 
 class Mods extends SlashCommand {
   filePath = __filename
@@ -42,7 +46,7 @@ class Mods extends SlashCommand {
             },
             {
               type: Str,
-              name: 'reson',
+              name: 'reason',
               required: true,
               description: 'Причина блокировки'
             },
@@ -67,7 +71,7 @@ class Mods extends SlashCommand {
             },
             {
               type: Str,
-              name: 'reson',
+              name: 'reason',
               description: 'Причина разблокировки'
             }
           ]
@@ -87,7 +91,7 @@ class Mods extends SlashCommand {
             },
             {
               type: Str,
-              name: 'reson',
+              name: 'reason',
               required: true,
               description: 'Причина блокировки'
             },
@@ -112,44 +116,44 @@ class Mods extends SlashCommand {
             },
             {
               type: Str,
-              name: 'reson',
+              name: 'reason',
               description: 'Причина разблокировки'
             }
           ]
         },
 
-        // {
-        //   type: Sub,
-        //   name: 'clear',
-        //   description: 'Очистить чат',
-        //   options: [
-        //     {
-        //       type: Int,
-        //       name: 'count',
-        //       required: true,
-        //       description: 'Количество удаляемых сообщений'
-        //     },
-        //     {
-        //       type: User,
-        //       name: 'user',
-        //       description: 'Пользователь, чьи сообщения нужно удалить.'
-        //     }
-        //   ]
-        // }
+        {
+          type: Sub,
+          name: 'clear',
+          description: 'Очистить чат',
+          options: [
+            {
+              type: Int,
+              name: 'count',
+              required: true,
+              description: 'Количество удаляемых сообщений'
+            },
+            {
+              type: User,
+              name: 'user',
+              description: 'Пользователь, чьи сообщения нужно удалить.'
+            }
+          ]
+        }
       ]
     })
   }
 
   @permission('mod.mutevoice')
   async mutevoice(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reson = '', time = '30m' } = opt as any
+    const { user = '', reason = '', time = '30m' } = opt as any
     if (ctx.member.id == user || await testPermission(user, 'mod.nomutevoice'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
 
-    api.append(user, mutes.voice, time, ctx.member.id, reson)
+    api.append(user, mutes.voice, time, ctx.member.id, reason)
       .catch(e => Logger.error(e))
 
     return {
@@ -160,10 +164,10 @@ class Mods extends SlashCommand {
 
   @permission('mod.unmutevoice')
   async unmutevoice(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reson = '' } = opt as any
+    const { user = '', reason = '' } = opt as any
 
 
-    api.delete(user, mutes.voice, ctx.member.id, reson)
+    api.delete(user, mutes.voice, ctx.member.id, reason)
       .catch(e => Logger.error(e))
 
     return {
@@ -174,14 +178,14 @@ class Mods extends SlashCommand {
 
   @permission('mod.mutechat')
   async mutechat(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reson = '', time = '30m' } = opt as any
+    const { user = '', reason = '', time = '30m' } = opt as any
     if (ctx.member.id == user || await testPermission(user, 'mod.nomutechat'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
 
-    api.append(user, mutes.chat, time, ctx.member.id, reson)
+    api.append(user, mutes.chat, time, ctx.member.id, reason)
       .catch(e => Logger.error(e))
 
     return {
@@ -192,9 +196,9 @@ class Mods extends SlashCommand {
 
   @permission('mod.unmutechat')
   async unmutechat(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reson = '' } = opt as any
+    const { user = '', reason = '' } = opt as any
 
-    api.delete(user, mutes.chat, ctx.member.id, reson)
+    api.delete(user, mutes.chat, ctx.member.id, reason)
       .catch(e => Logger.error(e))
 
     return {
@@ -207,9 +211,18 @@ class Mods extends SlashCommand {
   async clear(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '', count = 0 } = opt as any
 
+    if(count < 1 || count > 200)
+      return {
+        ephemeral: true,
+        content: `Количество сообщений должно быть от 1 до 200!`
+      }
+
+    chat.clearMessages(ctx.member.id, ctx.channelID, count, user)
+      .catch(e => null)
+      
     return {
       ephemeral: true,
-      content: `Команда пока не готова!`
+      content: `Запрос на выполнение передан!`
     }
   }
 

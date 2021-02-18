@@ -1,3 +1,5 @@
+#!/usr/bin/env ts-node
+
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
 import { logToRoom, makeLogs } from "~/lib/makelog";
@@ -7,6 +9,9 @@ import { Logger } from "~/lib/logger";
 import { tempModelEvents } from "~/models/Temp";
 import { mutes } from "~/config";
 import { remaining } from "~/lib/remaining";
+import { MyDate } from "~/lib/mydate";
+
+const fmt = 'DD.MM.YY hh:mm:ss (по МСК)'
 
 @register()
 export class ApiSender {
@@ -18,41 +23,54 @@ export class ApiSender {
     timeEnd: number,
     deltaTime: number,
     moderId: string,
-    reson: string
+    reason: string
   ) {
 
     let description = ``
     let big = deltaTime > 0
 
-    switch(mode) {
-      case 'add': {
-        if(moderId) description += `<@${moderId}> выдал <@&${roleId}> пользователю <@${userId}>`
-        else description += `Пользователь <@${userId}> получил <@&${roleId}>`
+    const def = () => {
+      description += `\n на срок: \`${remaining(Math.abs(deltaTime))}\``
+      description += ` до: \`${MyDate.format(timeEnd, fmt)}\``
+    }
 
-        description += ` на срок ${remaining(deltaTime)}.`
-        description += `\n <@&${roleId}> будет снят примерно в ${new Date(timeEnd)}`
+    switch (mode) {
+      case 'add': {
+        if (moderId) description += `<@${moderId}> выдал <@&${roleId}> пользователю <@${userId}>`
+        else description += `Пользователь <@${userId}> получил <@&${roleId}>`
+        def()
       }; break
 
       case 'update': {
-        if(moderId) description += `<@${moderId}> ${big? 'увеличил' : 'уменьшил'} <@&${roleId}> пользователю <@${userId}>`
-        else description += `У пользователя <@${userId}> ${big? 'увеличен' : 'уменьшен'} <@&${roleId}>`
-
-        description += ` на срок ${remaining(Math.abs(deltaTime))}.`
-        description += `\n <@&${roleId}> будет снят примерно в ${new Date(timeEnd)}`
+        if (moderId) description += `<@${moderId}> ${big ? 'увеличил' : 'уменьшил'} <@&${roleId}> пользователю <@${userId}>`
+        else description += `У пользователя <@${userId}> ${big ? 'увеличен' : 'уменьшен'} <@&${roleId}>`
+        def()
       }; break
 
       case 'delete': {
-        if(!moderId) description += `Закончился срок <@&${roleId}> у пользователя <@${userId}>`
+        if (!moderId) description += `Закончился срок <@&${roleId}> у пользователя <@${userId}>`
         else description += `<@${moderId}> снял <@&${roleId}> пользователю <@${userId}>`
       }; break
     }
 
-    if(reson) description += `\n\n Причина: \`\`\`${reson}\`\`\``
+    if (reason) description += `\n\n Причина: \`\`\`${reason}\`\`\``
 
     return {
       embed: {
         title: '[mute]',
         description
+      }
+    } as MessageOptions
+  }
+
+  @method()
+  @logToRoom('admin')
+  async clearReport(chatId: string, userId: string, count: number, user?: string) {
+    return {
+      content: `**[clearMessage]**`,
+      embed: {
+        color: '#ff0000',
+        description: `По запросу <@${userId}> в чате <#${chatId}> было удалено ${count} сообщений${user ? ` от пользователя <@${user}>` : ''}.`
       }
     } as MessageOptions
   }
@@ -122,24 +140,24 @@ export class ApiSender {
 
 main(__filename, () => {
   const sender = new ApiSender()
-  
+
   const tempRoleEvent = (mode: 'add' | 'update' | 'delete') => {
     return ((userId: string,
       roleId: string,
       timeEnd: number,
       deltaTime: number,
       moderId: string,
-      reson: string
+      reason: string
     ) => {
-      if(roleId == mutes.chat || roleId == mutes.voice) 
+      if (roleId == mutes.chat || roleId == mutes.voice)
         return sender.muteChange(
-          mode, userId, roleId, timeEnd, 
-          deltaTime, moderId, reson
+          mode, userId, roleId, timeEnd,
+          deltaTime, moderId, reason
         ).catch(e => Logger.error(e))
 
     }) as Parameters<(typeof tempModelEvents)['on']>[1]
   }
-  
+
   tempModelEvents.on('appendRole', tempRoleEvent('add'))
   tempModelEvents.on('updateRole', tempRoleEvent('update'))
   tempModelEvents.on('deleteRole', tempRoleEvent('delete'))

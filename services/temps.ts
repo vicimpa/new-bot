@@ -13,13 +13,13 @@ import { GuildMember, Role } from "discord.js";
 @register()
 export class TempRoles {
   @method()
-  async append(userId: string, roleId: string, time: string, moderId?: string, reson?: string) {
-    await TempModel.appendRole(userId, roleId, time, moderId, reson)
+  async append(userId: string, roleId: string, time: string, moderId?: string, reason?: string) {
+    await TempModel.appendRole(userId, roleId, time, moderId, reason)
   }
 
   @method()
-  async delete(userId: string, roleId: string, moderId?: string, reson?: string) {
-    await TempModel.removeRole(userId, roleId, moderId, reson)
+  async delete(userId: string, roleId: string, moderId?: string, reason?: string) {
+    await TempModel.removeRole(userId, roleId, moderId, reason)
   }
 }
 

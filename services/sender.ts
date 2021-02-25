@@ -15,7 +15,7 @@ const fmt = 'DD.MM.YY hh:mm:ss (по МСК)'
 
 @register()
 export class ApiSender {
-  @logToRoom(['jail'])
+  @logToRoom(['fines'])
   async muteChange(
     mode: 'add' | 'update' | 'delete',
     userId: string,
@@ -56,8 +56,8 @@ export class ApiSender {
     if (reason) description += `\n\n Причина: \`\`\`${reason}\`\`\``
 
     return {
+      content: `**[mute]** <@${userId}>`,
       embed: {
-        title: '[mute]',
         description
       }
     } as MessageOptions

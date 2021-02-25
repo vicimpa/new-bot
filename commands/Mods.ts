@@ -11,6 +11,7 @@ import { Logger } from "~/lib/logger";
 import { TempRoles } from "~/services/temps";
 import { ChatControl } from "~/services/chatcontrol";
 import { ApiSender } from "~/services/sender";
+import { timeparser } from "~/lib/timeparser";
 
 const {
   INTEGER: Int,
@@ -153,6 +154,16 @@ class Mods extends SlashCommand {
         content: `Вы не можете применить эту команду к данному пользоватею!`
       }
 
+    const minTime = timeparser('30m')
+    const nowTime = timeparser(time)
+
+    if(nowTime < minTime)
+      return {
+        ephemeral: true,
+        content: `Время блокировки не может быть меньше 30m!`
+      }
+
+
     api.append(user, mutes.voice, time, ctx.member.id, reason)
       .catch(e => Logger.error(e))
 
@@ -183,6 +194,15 @@ class Mods extends SlashCommand {
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
+      }
+
+    const minTime = timeparser('30m')
+    const nowTime = timeparser(time)
+
+    if(nowTime < minTime)
+      return {
+        ephemeral: true,
+        content: `Время блокировки не может быть меньше 30m!`
       }
 
     api.append(user, mutes.chat, time, ctx.member.id, reason)

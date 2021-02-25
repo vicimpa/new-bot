@@ -76,6 +76,29 @@ export class RolesApi {
   }
 
   @method()
+  async loadReactions(userId: string) {
+    console.time()
+    // const guild = await client.guilds.fetch(guildId)
+    const channel = await client.channels.fetch(rolesChannel)
+    const roles: string[] = []
+
+    if (!(channel instanceof TextChannel))
+      return roles
+
+    const messages = await channel.messages.fetch()
+
+    for (let [, mess] of messages) {
+      for (let [, react] of mess.reactions.cache) {
+        const users = await react.users.fetch()
+        if(users.has(userId)) roles.push(react.emoji.name)
+      }
+    }
+
+    console.timeEnd()
+    return roles
+  }
+
+  @method()
   async checkUpdate(userId: string, role: string) {
     const guild = await client.guilds.fetch(guildId)
     const channel = await guild.channels.cache.get(rolesChannel)
@@ -165,6 +188,8 @@ async function loadRoles() {
     store.checkRole = roles.find(e => e.name == `Проверяющий ${store.name}✓`)
   }
 }
+
+const d = new RolesApi()
 
 main(__filename, async () => {
   const guild = await client.guilds.fetch(guildId)

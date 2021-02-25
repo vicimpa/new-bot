@@ -10,6 +10,7 @@ import { permission, testPermission } from "~/lib/permissions";
 import { RolesApi } from "~/services/roles";
 import { ApiSender } from "~/services/sender";
 import { Logger } from "~/lib/logger";
+import { remaining } from "~/lib/remaining";
 import { ReportModel } from "~/models/Report";
 
 const sender = new ApiSender()
@@ -87,7 +88,7 @@ class Report extends SlashCommand {
 
     if(hold > new Date()) return {
       ephemeral: true,
-      content: `Вы можете отправить следующий репорт только после ${hold}.`
+      content: `Вы можете отправить следующий репорт только через ${remaining(+hold - +new Date())}.`
     }
 
     if(message.length < 3) return {

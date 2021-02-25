@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import { GuildMember, VoiceChannel } from "discord.js";
-import { guildId } from "~/config";
+import { guildId, privates } from "~/config";
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
 import { Logger } from "~/lib/logger";
@@ -14,6 +14,8 @@ async function checkVoice(voice: VoiceChannel) {
 
 async function checkMember(voice: VoiceChannel, member: GuildMember) {
   if (!voice) return
+  if(privates.indexOf(voice.parentID) == -1) return
+  
   const isConnect = voice.permissionsFor(member).has('CONNECT')
   const isSpeak = voice.permissionsFor(member).has('SPEAK')
 

@@ -105,7 +105,7 @@ class Generator extends SlashCommand {
 
     return {
       ephemeral: true,
-      content: `Ваш ник: \`${genName(method, length)}\``
+      content: `Ваш ник длиной ${length} и сложностью ${method}: \`${genName(method, length)}\``
     }
   }
 
@@ -121,7 +121,7 @@ class Generator extends SlashCommand {
 
     return {
       ephemeral: true,
-      content: `Ваш пароль: \`${password(length)}\``
+      content: `Ваш пароль длиной в ${length} символов: \`${password(length)}\``
     }
   }
 
@@ -137,7 +137,7 @@ class Generator extends SlashCommand {
 
     return {
       ephemeral: true,
-      content: `Ваше число: \`${rand(one, two)}\``
+      content: `Ваше число в диапазоне (${one} - ${two}): \`${rand(one, two)}\``
     }
   }
 

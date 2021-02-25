@@ -23,7 +23,7 @@ class UserCMD extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
       name: 'user',
-      description: 'Генератор всякого',
+      description: 'Работа с пользователем',
 
       options: [
         {

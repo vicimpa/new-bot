@@ -27,9 +27,9 @@ async function main() {
 
   Logger.log('Deleted!')
 
-  await creator
-    .registerCommandsIn(commandsPath)
-    .syncCommands()
+  // await creator
+  //   .registerCommandsIn(commandsPath)
+  //   .syncCommands()
 }
 
 main().catch(e => Logger.error(e))

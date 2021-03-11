@@ -5,6 +5,10 @@ import { timeparser } from "~/lib/timeparser"
 export const guildId = '805944675188867112'
 export const rolesChannel = '807067262569283645'
 
+import ctl from "./data/ctl.json"
+import cmd from "./data/cmd.json"
+import qiwi from "./data/qiwi.json"
+
 export const privates = [
   '808155036910616596'
 ]
@@ -58,22 +62,9 @@ export const webPort = 4001
 export const qiwiHost = '127.0.0.1'
 export const qiwiPort = 4002
 
-export const mongoUrl = 'mongodb://localhost:27017/howdycord'
+export const mongoUrl = 'mongodb://127.0.0.2:65017/hellcord'
 
 export const qiwiPublic = readFileSync('./data/qiwi_public', 'utf-8')
 export const qiwiPrivate = readFileSync('./data/qiwi_private', 'utf-8')
 
-export const bots = {
-  ctl: {
-    client: readFileSync('./data/ctl_client', 'utf-8'),
-    public: readFileSync('./data/ctl_public', 'utf-8'),
-    secret: readFileSync('./data/ctl_secret', 'utf-8'),
-    token: readFileSync('./data/ctl_token', 'utf-8'),
-  },
-  cmd: {
-    client: readFileSync('./data/cmd_client', 'utf-8'),
-    public: readFileSync('./data/cmd_public', 'utf-8'),
-    secret: readFileSync('./data/cmd_secret', 'utf-8'),
-    token: readFileSync('./data/cmd_token', 'utf-8'),
-  }
-}
+export const bots = { ctl, cmd }

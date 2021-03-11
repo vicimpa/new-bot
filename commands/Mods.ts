@@ -34,6 +34,44 @@ class Mods extends SlashCommand {
       description: 'Команды для модерации',
 
       options: [
+        // {
+        //   type: Sub,
+        //   name: 'ban',
+        //   description: 'Забанить перманентно человека',
+        //   options: [
+        //     {
+        //       type: User,
+        //       name: 'user',
+        //       required: true,
+        //       description: 'Пользователь для блокировки'
+        //     },
+        //     {
+        //       type: Str,
+        //       name: 'reason',
+        //       required: true,
+        //       description: 'Причина блокировки'
+        //     }
+        //   ]
+        // },
+        // {
+        //   type: Sub,
+        //   name: 'unban',
+        //   description: 'Забанить перманентно человека',
+        //   options: [
+        //     {
+        //       type: User,
+        //       name: 'user',
+        //       required: true,
+        //       description: 'Пользователь для блокировки'
+        //     },
+        //     {
+        //       type: Str,
+        //       name: 'reason',
+        //       required: true,
+        //       description: 'Причина блокировки'
+        //     }
+        //   ]
+        // },
         {
           type: Sub,
           name: 'mutevoice',
@@ -145,6 +183,25 @@ class Mods extends SlashCommand {
     })
   }
 
+  @permission('mod.ban')
+  async ban(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '', reason = ''} = opt as any
+    if (ctx.member.id == user || await testPermission(user, 'mod.noban'))
+      return {
+        ephemeral: true,
+        content: `Вы не можете применить эту команду к данному пользоватею!`
+      }
+
+    return null
+  }
+
+  @permission('mod.unban')
+  async unban(ctx: CommandContext, opt: ConvertedOption) {
+    const { user = '', reason = ''} = opt as any
+
+    return null
+  }
+
   @permission('mod.mutevoice')
   async mutevoice(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '', reason = '', time = '30m' } = opt as any
@@ -163,7 +220,6 @@ class Mods extends SlashCommand {
         content: `Время блокировки не может быть меньше 30m!`
       }
 
-
     api.append(user, mutes.voice, time, ctx.member.id, reason)
       .catch(e => Logger.error(e))
 
@@ -176,7 +232,6 @@ class Mods extends SlashCommand {
   @permission('mod.unmutevoice')
   async unmutevoice(ctx: CommandContext, opt: ConvertedOption) {
     const { user = '', reason = '' } = opt as any
-
 
     api.delete(user, mutes.voice, ctx.member.id, reason)
       .catch(e => Logger.error(e))

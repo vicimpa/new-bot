@@ -1,6 +1,7 @@
 import { Base, field, schema, makeModel, method, pre } from "~/lib/mongoose";
 import { timeparser } from "~/lib/timeparser";
 import { Events } from "~/lib/rpcapi";
+import { sponsors } from "../config";
 
 export const tempModelEvents = new (class TemproleEvents extends Events<{
   appendRole(
@@ -132,6 +133,10 @@ export class TempModel extends makeModel(Temp) {
       +find.endTime - +endTime, moderId, reason)
 
     return find
+  }
+
+  static async checkDonate(userId: string) {
+    return this.findOne({userId, roleId: { $in: sponsors.map(e => e.id)}, endTime: { $gte: new Date() }})
   }
 
   static async removeRole(

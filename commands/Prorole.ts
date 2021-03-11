@@ -132,4 +132,4 @@ class Prorole extends SlashCommand {
   }
 }
 
-export = Prorole
+// export = Prorole

@@ -7,7 +7,7 @@ import { MessageOptions } from "discord.js";
 import { makeApi, method, register } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
 import { tempModelEvents } from "~/models/Temp";
-import { mutes } from "~/config";
+import { mutes, sponsors } from "~/config";
 import { remaining } from "~/lib/remaining";
 import { MyDate } from "~/lib/mydate";
 
@@ -15,6 +15,62 @@ const fmt = 'DD.MM.YY hh:mm:ss (по МСК)'
 
 @register()
 export class ApiSender {
+  @logToRoom(['fines'])
+  async ban(set = true, moderId: string, userId: string, reson: string) {
+    
+  }
+
+  @method()
+  @logToRoom(['donations'])
+  async message(userId: string, message: string, amount: number) {
+    return {
+      content: `**[donate]** <@${userId}> ${amount.toFixed(2)}руб`,
+      embed: {
+        description: `<@${userId}> оставил сообщение: \`\`\`${message}\`\`\``
+      }
+    } as MessageOptions
+  }
+
+  @logToRoom(['donations'])
+  async donate(
+    mode: 'add' | 'update' | 'delete',
+    userId: string, 
+    roleId: string,
+    deltaTime: number,
+    timeEnd: number
+  ) {
+
+    let description = ``
+    let big = deltaTime > 0
+
+    const def = () => {
+      description += `\nРоль будет снята: \`${MyDate.format(timeEnd, fmt)}\``
+    }
+
+    switch (mode) {
+      case 'add': {
+        description += `Пользователь <@${userId}> получил <@&${roleId}>`
+        def()
+      }; break
+
+      case 'update': {
+        description += `У пользователя <@${userId}> ${big ? 'увеличен' : 'уменьшен'} <@&${roleId}>`
+        def()
+      }; break
+
+      case 'delete': {
+        description += `Закончился срок <@&${roleId}> у пользователя <@${userId}>`
+      }; break
+    }
+
+    return {
+      content: `**[donate]** <@${userId}>`,
+      embed: {
+        description
+      }
+    } as MessageOptions
+  }
+
   @logToRoom(['fines'])
   async muteChange(
     mode: 'add' | 'update' | 'delete',
@@ -137,7 +193,6 @@ export class ApiSender {
   }
 }
 
-
 main(__filename, () => {
   const sender = new ApiSender()
 
@@ -149,11 +204,14 @@ main(__filename, () => {
       moderId: string,
       reason: string
     ) => {
-      if (roleId == mutes.chat || roleId == mutes.voice)
+      if (Object.values(mutes).includes(roleId))
         return sender.muteChange(
           mode, userId, roleId, timeEnd,
           deltaTime, moderId, reason
         ).catch(e => Logger.error(e))
+
+      if(sponsors.find(e => e.id == roleId))
+          return sender.donate( mode, userId, roleId, deltaTime, timeEnd)
 
     }) as Parameters<(typeof tempModelEvents)['on']>[1]
   }

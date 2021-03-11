@@ -15,8 +15,8 @@ export class MyDate extends Date {
   get D() { return this.getDate() }
   set D(v) { this.setDate(v) }
   
-  get M() { return this.getMonth() }
-  set M(v) { this.setMonth(v) }
+  get M() { return this.getMonth()+1 }
+  set M(v) { this.setMonth(v)-1 }
   
   get Y() { return this.getFullYear() }
   set Y(v) { this.setFullYear(v) }
@@ -25,7 +25,7 @@ export class MyDate extends Date {
     return ('0'.repeat(n) + v).substr(-n)
   }
 
-  format(format = '') {
+  format(format = 'DD.MM.YYYY') {
     while(true) {
       const f = re.exec(format)
       if(!f) return format
@@ -52,8 +52,8 @@ export class MyUTCDate extends Date {
   get D() { return this.getUTCDate() }
   set D(v) { this.setUTCDate(v) }
   
-  get M() { return this.getUTCMonth() }
-  set M(v) { this.setUTCMonth(v) }
+  get M() { return this.getUTCMonth()+1 }
+  set M(v) { this.setUTCMonth(v-1) }
   
   get Y() { return this.getUTCFullYear() }
   set Y(v) { this.setUTCFullYear(v) }

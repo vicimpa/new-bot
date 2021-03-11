@@ -407,9 +407,9 @@ class RoomsStore {
 
 async function tick() {
   for (let { group, voices, create } of groups) {
+    await group.fetch()
     const sorted = group.children
-      .sort((a, b) =>
-        a.createdTimestamp - b.createdTimestamp)
+      .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
 
     for (let [, channel] of sorted) {
       if (!(channel instanceof VoiceChannel))
@@ -419,7 +419,10 @@ async function tick() {
         continue
 
       if (!voices.find(e => e.channel.id == channel.id))
-        channel.delete().catch(e => Logger.error(e))
+        channel.delete().catch(e => {
+          group.children.delete(channel.id)
+          Logger.error(e)
+        })
     }
   }
 

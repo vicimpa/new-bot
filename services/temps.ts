@@ -9,6 +9,10 @@ import { main } from "~/lib/main";
 import { makeApi, register, method } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
 import { GuildMember, Role } from "discord.js";
+import { PaymentModel } from "~/models/Payment";
+import { ApiSender } from "./sender";
+
+const sender = new ApiSender()
 
 @register()
 export class TempRoles {
@@ -20,6 +24,14 @@ export class TempRoles {
   @method()
   async delete(userId: string, roleId: string, moderId?: string, reason?: string) {
     await TempModel.removeRole(userId, roleId, moderId, reason)
+  }
+
+  @method()
+  async getDonate(userId: string) {
+    const f = await TempModel.checkDonate(userId)
+    if (!f) return null
+    const { roleId, endTime } = f
+    return { roleId, endTime: +endTime }
   }
 }
 
@@ -97,10 +109,43 @@ async function tick() {
   await tick()
 }
 
+async function donate() {
+  const pays = await PaymentModel.find({ isPay: true, isApply: false, type: 'role' })
+
+  for (let p of pays) {
+    const { userId, data } = p
+    TempModel.appendRole(userId, data, '30D')
+      .then(e => (p.isApply = true) && p)
+      .then(e => e.save())
+      .catch(e => Logger.error(e))
+  }
+
+  await delay(1000)
+  await donate()
+}
+
+async function donate2() {
+  const pays = await PaymentModel.find({ isPay: true, isApply: false, type: 'message' })
+
+  for (let p of pays) {
+    const { userId, data, amount } = p
+    sender.message(userId, data, amount)
+      .then(e => (p.isApply = true) && p)
+      .then(e => e.save())
+      .catch(e => Logger.error(e))
+  }
+
+  await delay(1000)
+  await donate2()
+}
+
+
 main(__filename, () => {
   makeApi(TempRoles)
 
   client.on('ready', () => {
     tick().catch(e => Logger.error(e))
+    donate().catch(e => Logger.error(e))
+    donate2().catch(e => Logger.error(e))
   })
 })

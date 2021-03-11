@@ -72,4 +72,4 @@ class Temp extends SlashCommand {
   }
 }
 
-// export = Temp
+export = Temp

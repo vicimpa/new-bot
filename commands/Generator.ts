@@ -95,7 +95,7 @@ class Generator extends SlashCommand {
 
   @permission('generator.nick')
   async nick(ctx: CommandContext, opt: ConvertedOption) {
-    const { method = 1, length = undefined } = opt as any
+    const { method = 1, length = 5 } = opt as any // edit length = undefined -> length = 5
 
     if (length && (length < 3 || length > 15))
       return {

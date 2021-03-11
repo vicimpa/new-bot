@@ -28,7 +28,7 @@ export const removePrivateAfter = 2000
 
 export const commandsPath = {
   dirname: join(process.cwd(), 'commands'),
-  filter: /^([^\.].*)\.ts$/
+  filter: /^([^\.].*)\.js$/
 }
 
 export const mutes = {
@@ -36,19 +36,32 @@ export const mutes = {
   voice: '805944675243917366'
 }
 
-export const baseRoute = '/'
-export const httpPort = 4000
-export const httpHost = '127.0.0.1'
+export const sponsors = [
+  {id: '805944675235397680', price: 150, name: 'Sponsor'},
+  {id: '805944675235397681', price: 250, name: 'Sponsor +'},
+  {id: '805944675243917362', price: 500, name: 'Sponsor XL'}
+]
+
 export const blockLimit = 30
 
 export const rpcHost = '127.0.0.1'
 export const rpcPort = 2525
 export const rpcTimeout = timeparser('20s')
 
+export const baseRoute = '/'
+export const httpPort = 4000
+export const httpHost = '127.0.0.1'
+
 export const webHost = '127.0.0.1'
 export const webPort = 4001
 
+export const qiwiHost = '127.0.0.1'
+export const qiwiPort = 4002
+
 export const mongoUrl = 'mongodb://localhost:27017/howdycord'
+
+export const qiwiPublic = readFileSync('./data/qiwi_public', 'utf-8')
+export const qiwiPrivate = readFileSync('./data/qiwi_private', 'utf-8')
 
 export const bots = {
   ctl: {

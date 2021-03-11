@@ -8,27 +8,33 @@ import { Logger } from "~/lib/logger";
 
 async function checkVoice(voice: VoiceChannel) {
   if (!voice) return
-  for(let [id, member] of voice.members)
+  for (let [id, member] of voice.members)
     checkMember(voice, member)
 }
 
 async function checkMember(voice: VoiceChannel, member: GuildMember) {
   if (!voice) return
-  if(privates.indexOf(voice.parentID) == -1) return
-  
+  if (privates.indexOf(voice.parentID) == -1) return
+
   const isConnect = voice.permissionsFor(member).has('CONNECT')
   const isSpeak = voice.permissionsFor(member).has('SPEAK')
 
   if (!isConnect && voice.members.has(member.id))
-    member.voice.setChannel(null).catch(() => {})
+    member.voice.setChannel(null).catch(() => { })
 
   if (isSpeak && voice.members.has(member.id) && member.voice.serverMute)
     if (member.voice.channel)
-      member.voice.setMute(false).catch(() => {})
+      member.voice.setMute(false).catch(() => { })
 
   if (!isSpeak && voice.members.has(member.id) && !member.voice.serverMute)
     if (member.voice.channel)
-      member.voice.setMute(true).catch(() => {})
+      member.voice.setMute(true).catch(() => { })
+
+  if (!member.voice.channelID) return null
+
+  // if (member.voice.selfDeaf && member.voice.selfMute)
+  //   await member.voice.setChannel(null)
+  //     .catch(e => Logger.error(e))
 }
 
 main(__filename, () => {

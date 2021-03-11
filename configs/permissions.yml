@@ -2,8 +2,12 @@ permissions:
   admin:
     - '*'
 
+  ban:
+    - '-*'
+
   moder:
     # - '-report.moder'
+    - '-temps.role'
     - '-prorole.all'
     - '*'
 
@@ -15,6 +19,9 @@ permissions:
     - 'voice.notmute'
 
   user: 
+    - 'donate.status'
+    - 'donate.role'
+    - 'donate.message'
     - 'user.avatar'
     - 'report.base'
     - 'generator.*'
@@ -63,12 +70,12 @@ groups:
 
   admin:
     - '&805944675243917370' #admin
-    - '&805944675243917369' #support
+    - '&817494176412598281' #dev
 
   moder:
     - '&805944675243917368' #moder
+    - '&805944675243917369' #support
     - '681736660572045413'  #PromiSe (Twink)
-    - '235088799074484224'  #Rythm
     - '770721580464209992'  #HellCommands
     - '769589561386467329'  #HellControll
 
@@ -80,3 +87,6 @@ groups:
 
   user:
     - '&805944675188867112' #everyone 
+
+  ban:
+    - '&810356477306601505' # global ban

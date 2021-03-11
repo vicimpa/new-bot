@@ -109,7 +109,7 @@ class Voice extends SlashCommand {
         {
           type: Sub,
           name: 'name',
-          description: 'Посмотерь имя Вашего канала',
+          description: 'Посмотреть или установить имя Вашего канала',
           options: [
             {
               type: Str,
@@ -213,7 +213,7 @@ class Voice extends SlashCommand {
         throw new Error(Status[status])
     }
   }
-
+  
   @permission('voice.unblockall')
   async unblockall(ctx: CommandContext, opt: ConvertedOption) {
     const status = await api.clear(ctx.member.id, true, false)
@@ -366,6 +366,13 @@ class Voice extends SlashCommand {
         content: `Имя Вашей комнаты \`${info.name}\``
       }
     }
+
+    if(name.length > 100 || name.length < 3)
+      return {
+        ephemeral: true,
+        content: `Имя Вашей комнаты должно быть от 3 до 100`
+      }
+
     return this.setName(ctx, name)
   }
 
@@ -393,7 +400,7 @@ class Voice extends SlashCommand {
       if (!info) throw new Error('No info')
       return {
         ephemeral: true,
-        content: `Лимил Вашей комнаты \`${info.limit}\``
+        content: `Лимит Вашей комнаты \`${info.limit}\``
       }
     }
     return this.setLimit(ctx, limit)

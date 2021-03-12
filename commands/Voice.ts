@@ -34,44 +34,6 @@ class Voice extends SlashCommand {
       options: [
         {
           type: Sub,
-          name: 'block',
-          description: 'Заблокировать пользователя в своем канале',
-          options: [
-            {
-              type: User,
-              name: 'user',
-              required: true,
-              description: 'Пользователь для блокировки'
-            }
-          ]
-        },
-        {
-          type: Sub,
-          name: 'unblock',
-          description: 'Разблокировать пользователя в своем канале',
-          options: [
-            {
-              type: User,
-              name: 'user',
-              required: true,
-              description: 'Пользователь для разблокировки'
-            }
-          ]
-        },
-        {
-          type: Sub,
-          name: 'unblockall',
-          description: 'Разблокировать всех пользователей в своем канале',
-        },
-        {
-          type: Sub,
-          name: 'blocklist',
-          description: 'Показать всех, кому запрещено подключаться',
-        },
-
-
-        {
-          type: Sub,
           name: 'mute',
           description: 'Запретить говорить пользователю в своем канале',
           options: [
@@ -83,6 +45,21 @@ class Voice extends SlashCommand {
             }
           ]
         },
+
+        {
+          type: Sub,
+          name: 'block',
+          description: 'Заблокировать пользователя в своем канале',
+          options: [
+            {
+              type: User,
+              name: 'user',
+              required: true,
+              description: 'Пользователь для блокировки'
+            }
+          ]
+        },
+
         {
           type: Sub,
           name: 'unmute',
@@ -96,39 +73,71 @@ class Voice extends SlashCommand {
             }
           ]
         },
+
         {
           type: Sub,
-          name: 'unmuteall',
-          description: 'Разрешить говорить всем пользователям в своем канале',
+          name: 'unblock',
+          description: 'Разблокировать пользователя в своем канале',
+          options: [
+            {
+              type: User,
+              name: 'user',
+              required: true,
+              description: 'Пользователь для разблокировки'
+            }
+          ]
         },
+
+        {
+          type: Sub,
+          name: 'name',
+          description: 'Установить имя Вашего канала',
+          options: [
+            {
+              type: Str,
+              required: true,
+              name: 'name',
+              description: 'Имя канала'
+            }
+          ]
+        },
+
+        {
+          type: Sub,
+          name: 'limit',
+          description: 'Установить лимит Вашего канала',
+          options: [
+            {
+              type: Int,
+              required: true,
+              name: 'limit',
+              description: 'Лимит канала'
+            }
+          ]
+        },
+
         {
           type: Sub,
           name: 'mutelist',
           description: 'Показать всех, кому запрещено говорить',
         },
+
         {
           type: Sub,
-          name: 'name',
-          description: 'Посмотреть или установить имя Вашего канала',
-          options: [
-            {
-              type: Str,
-              name: 'name',
-              description: 'Установить имя Вашему каналу'
-            }
-          ]
+          name: 'unblockall',
+          description: 'Разблокировать всех пользователей в своем канале',
         },
+
         {
           type: Sub,
-          name: 'limit',
-          description: 'Посмотреть лимит Вашего канала',
-          options: [
-            {
-              type: Int,
-              name: 'limit',
-              description: 'Установить лимит Вашему каналу'
-            }
-          ]
+          name: 'blocklist',
+          description: 'Показать всех, кому запрещено подключаться',
+        },
+
+        {
+          type: Sub,
+          name: 'unmuteall',
+          description: 'Разрешить говорить всем пользователям в своем канале',
         }
 
       ]

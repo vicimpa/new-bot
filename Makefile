@@ -1,7 +1,7 @@
 M:=${shell pwd}/node_modules/.bin/
 
-build:
-	@${M}tsc
+tsc:
+	@${M}tsc -w
 
 cmd:
 	@echo Sync...

@@ -54,17 +54,17 @@ export const rpcTimeout = timeparser('20s')
 
 export const baseRoute = '/'
 export const httpPort = 4000
-export const httpHost = '127.0.0.1'
+export const httpHost = '127.0.0.2'
 
-export const webHost = '127.0.0.1'
+export const webHost = '127.0.0.2'
 export const webPort = 4001
 
-export const qiwiHost = '127.0.0.1'
+export const qiwiHost = '127.0.0.2'
 export const qiwiPort = 4002
 
 export const mongoUrl = 'mongodb://127.0.0.2:65017/hellcord'
 
-export const qiwiPublic = readFileSync('./data/qiwi_public', 'utf-8')
-export const qiwiPrivate = readFileSync('./data/qiwi_private', 'utf-8')
+export const qiwiPublic = qiwi.public
+export const qiwiPrivate = qiwi.private
 
 export const bots = { ctl, cmd }

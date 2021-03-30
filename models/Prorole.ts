@@ -60,4 +60,9 @@ export class ProroleModel extends makeModel(Prorole) {
   static async getUser(_id: string) {
     return await this.findOne({_id}) || new this({_id})
   }  
+
+  static async getRolesById(_id: string) {
+    return this.getUser(_id)
+      .then(e => [...e.roles])
+  }
 }

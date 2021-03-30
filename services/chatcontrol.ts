@@ -15,8 +15,7 @@ export class ChatControl {
 
   @method()
   async clearMessages(moderId: string, chatId: string, count = 0, user?: string) {
-    const guild = await client.guilds.fetch(guildId)
-      .catch(e => null as Guild)
+    const { guild } = client
 
     if (!guild) return null
 
@@ -26,29 +25,29 @@ export class ChatControl {
 
     let removed = 0
     let last: string = null
-    
+
     while (count > 0) {
       try {
         let finds = await channel.messages.fetch({
           limit: 100, ...(last ? { before: last } : {})
         })
-        for(let [,find] of finds ) {
+        for (let [, find] of finds) {
           last = find.id
 
           if (user && find.author.id != user)
             continue
 
-          if(count <= 0) {
+          if (count <= 0) {
             sender.clearReport(chatId, moderId, removed, user)
               .catch(e => Logger.error(e))
             return removed
-          } 
+          }
 
           count--
           removed++
           find.delete().catch(e => Logger.error(e))
         }
-      }catch(e) {
+      } catch (e) {
         sender.clearReport(chatId, moderId, removed, user)
           .catch(e => Logger.error(e))
         return removed

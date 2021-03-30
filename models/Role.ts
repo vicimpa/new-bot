@@ -1,129 +1,87 @@
 import { Base, field, method, pre, schema, makeModel } from "~/lib/mongoose";
-import { osRoles, specificRoles, languageRoles } from "~/roles.json";
+
+
 
 @schema()
-class Roles extends Base {
+class Role extends Base {
   @field({ type: String, required: true })
   _id: string
 
-  @field({ type: Object, default() { return {} } })
-  roles: { [key: string]: Date }
+  @field({ type: Array, default: [] })
+  roles: string[]
 
-  @field({ type: Object, default() { return {} } })
-  checks: { [key: string]: Date }
-
-  // @field(String)
-  // rolesString: string
-
-  // @field(String)
-  // checksString: string
+  @field({ type: Date })
+  updated: Date
 
   @method()
-  hasRole(key: string, check = false) {
-    return !!this.mutable(check)[key]
-  }
-
-  // @method()
-  // mutable(check = false) {
-  //   if (check) {
-  //     try {
-  //       this.checks = JSON.parse(this.checksString)
-  //       for(let key in this.checks)
-  //         this.checks[key] = new Date(this.checks[key])
-  //     }catch(e) {
-  //       this.checks = {}
-  //     }
-      
-  //     return this.checks
-  //   }
-
-  //   try {
-  //     this.roles = JSON.parse(this.rolesString)
-  //     for(let key in this.roles)
-  //       this.roles[key] = new Date(this.roles[key])
-
-  //   }catch(e) {
-  //     this.roles = {}
-  //   }
-
-  //   return this.roles
-  // }
-
-  @method()
-  mutable(check = false) {
-    if (check) {
-      if(!this.checks) this.checks = {}
-      Object.entries(this.checks).map(e => this.checks[e[0]] = new Date(e[1]))
-      return this.checks = {...this.checks}
-    }
-
-    if(!this.roles) this.roles = {}
-    Object.entries(this.roles).map(e => this.roles[e[0]] = new Date(e[1]))
-    return this.roles = {...this.roles}
+  async toggleRole(_id: string, key: string) {
+    if (this.hasRole(_id, key)) 
+      return this.unsetRole(_id, key)
+    else
+      return this.setRole(_id, key)
   }
 
   @method()
-  toggleRole(key: string, check = false) {
-    const mute = this.mutable(check)
-
-    if (mute[key]) delete mute[key]
-    else mute[key] = new Date()
-
-    return this.save()
-  }
-
-  @method()
-  setRole(key: string, check = false) {
-    const mute = this.mutable(check)
-
-    if (!mute[key]) {
-      mute[key] = new Date()
+  async setRole(_id: string, key: string) {
+    if (!this.hasRole(_id, key)) {
+      this.roles.push(key)
       return this.save()
     }
-
     return this
   }
 
   @method()
-  unsetRole(key: string, check = false) {
-    const mute = this.mutable(check)
-
-    if (mute[key]) {
-      delete mute[key]
+  async unsetRole(_id: string, key: string) {
+    if (this.hasRole(_id, key)) {
+      this.roles = this.roles.filter(e => e != key)
       return this.save()
     }
-
     return this
+  }
+
+  @method()
+  hasRole(_id: string, key: string) {
+    return this.roles.indexOf(key) != -1
+  }
+
+  @method()
+  async getRoles(_id: string) {
+    return [...this.roles]
   }
 
   @pre('save')
   private _presave() {
-    this.roles = JSON.parse(JSON.stringify(this.roles))
-    this.checks = JSON.parse(JSON.stringify(this.checks))
+    this.updated = new Date()
   }
 }
 
-export class RolesModel extends makeModel(Roles) {
+export class RoleModel extends makeModel(Role) {
   static async getById(_id: string) {
     return (await this.findOne({ _id })) || new this({ _id })
   }
-  static async toggleRole(_id: string, key: string, check = false) {
-    const find = await this.getById(_id)
-    return find.toggleRole(key, check)
+
+  static async toggleRole(_id: string, key: string) {
+    return (await this.getById(_id))
+      .toggleRole(_id, key)
   }
 
-  static async setRole(_id: string, key: string, check = false) {
-    const find = await this.getById(_id)
-    return find.setRole(key, check)
+  static async setRole(_id: string, key: string) {
+    return (await this.getById(_id))
+      .setRole(_id, key)
   }
 
-  static async unsetRole(_id: string, key: string, check = false) {
-    const find = await this.getById(_id)
-    return find.unsetRole(key, check)
+  static async unsetRole(_id: string, key: string) {
+    return (await this.getById(_id))
+      .unsetRole(_id, key)
   }
 
-  static async hasRole(_id: string, key: string, check = false) {
-    const find = await this.getById(_id)
-    return find.hasRole(key, check)
+  static async hasRole(_id: string, key: string) {
+    return (await this.getById(_id))
+      .hasRole(_id, key)
+  }
+
+  static async getRolesById(_id: string) {
+    return (await this.getById(_id))
+      .getRoles(_id)
   }
 }

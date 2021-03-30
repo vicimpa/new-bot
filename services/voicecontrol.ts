@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import { GuildMember, VoiceChannel } from "discord.js";
-import { guildId, privates } from "~/config";
+import { actions, guildId, privates } from "~/config";
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
 import { Logger } from "~/lib/logger";
@@ -14,7 +14,10 @@ async function checkVoice(voice: VoiceChannel) {
 
 async function checkMember(voice: VoiceChannel, member: GuildMember) {
   if (!voice) return
-  if (privates.indexOf(voice.parentID) == -1) return
+  if (
+    privates.indexOf(voice.parentID) == -1 &&
+    actions.indexOf(voice.parentID) == -1
+  ) return
 
   const isConnect = voice.permissionsFor(member).has('CONNECT')
   const isSpeak = voice.permissionsFor(member).has('SPEAK')
@@ -39,7 +42,8 @@ async function checkMember(voice: VoiceChannel, member: GuildMember) {
 
 main(__filename, () => {
   client.on('ready', () => {
-    client.guilds.fetch(guildId)
+    Promise.resolve()
+      .then(e => client.guild)
       .then(e => e.channels.cache.array())
       .then(e => e.filter(e => e instanceof VoiceChannel))
       .then(e => e.map(checkVoice))

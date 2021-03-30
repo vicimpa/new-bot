@@ -42,7 +42,7 @@ export class VoiceApi {
     if (!block && !mute) return Status.NO_METHOD
 
     const info = await this.getInfo(user)
-    if(!info) return Status.UNKNOW_ERROR
+    if (!info) return Status.UNKNOW_ERROR
 
     const blockIndex = info.blocks.indexOf(blockId)
     const muteIndex = info.mutes.indexOf(blockId)
@@ -83,7 +83,7 @@ export class VoiceApi {
       const voiceChannel = group.findVoice(user).channel
       if (voiceChannel) voiceChannel.overwritePermissions(channelInfo.permissions)
         .catch(() => { })
-    }else {
+    } else {
       PrivateModel.updatePrivate(user, info)
         .catch(e => null)
     }
@@ -96,7 +96,7 @@ export class VoiceApi {
     if (!block && !mute) return []
 
     const info = await this.getInfo(user)
-    if(!info) return []
+    if (!info) return []
     if (block) return info.blocks
     if (mute) return info.mutes
     return []
@@ -107,17 +107,17 @@ export class VoiceApi {
     if (!block && !mute) return Status.NO_METHOD
 
     const info = await this.getInfo(user)
-    if(!info) return Status.UNKNOW_ERROR
+    if (!info) return Status.UNKNOW_ERROR
     const group = RoomsStore.findGroup(user)
 
     if (block) {
-      if(!info.blocks.length)
+      if (!info.blocks.length)
         return Status.USER_EXISTS
 
       info.blocks = []
     }
     if (mute) {
-      if(!info.mutes.length)
+      if (!info.mutes.length)
         return Status.USER_EXISTS
 
       info.mutes = []
@@ -128,7 +128,7 @@ export class VoiceApi {
       const voiceChannel = group.findVoice(user).channel
       if (voiceChannel) voiceChannel.overwritePermissions(channelInfo.permissions)
         .catch(() => { })
-    }else {
+    } else {
       PrivateModel.updatePrivate(user, info)
         .catch(e => null)
     }
@@ -138,9 +138,8 @@ export class VoiceApi {
 
   @method()
   async getInfo(user: string) {
-    const guild = await client.guilds.fetch(guildId)
-      .catch(e => null as Guild)
-
+    const { guild } = client
+    
     if (!guild) return null
 
     const member = await guild.members.fetch(user)
@@ -154,7 +153,7 @@ export class VoiceApi {
   @method()
   async setName(user: string, name: string) {
     const info = await this.getInfo(user)
-    if(!info) return Status.UNKNOW_ERROR
+    if (!info) return Status.UNKNOW_ERROR
     const group = RoomsStore.findGroup(user)
 
     info.name = name
@@ -166,7 +165,7 @@ export class VoiceApi {
         voiceChannel.setName(name, 'command user')
           .catch(e => null)
       }
-    }else {
+    } else {
       PrivateModel.updatePrivate(user, info)
         .catch(e => null)
     }
@@ -177,7 +176,7 @@ export class VoiceApi {
   @method()
   async setLimit(user: string, limit: number) {
     const info = await this.getInfo(user)
-    if(!info) return Status.UNKNOW_ERROR
+    if (!info) return Status.UNKNOW_ERROR
     const group = RoomsStore.findGroup(user)
 
     info.limit = limit
@@ -186,14 +185,14 @@ export class VoiceApi {
       const voiceChannel = group.findVoice(user).channel
       if (voiceChannel) voiceChannel.setUserLimit(limit)
         .catch(e => null)
-    }else {
+    } else {
       PrivateModel.updatePrivate(user, info)
         .catch(e => null)
     }
 
     return Status.OK
   }
- 
+
   static Action = Action
   static Status = Status
 }
@@ -384,7 +383,7 @@ class RoomsStore {
       limit = 0, blocks = [], mutes = []
     } = await PrivateModel.get(member.id) || {}
 
-    if(!name.trim())
+    if (!name.trim())
       name = `Room ${member.user.discriminator}`
 
     return {

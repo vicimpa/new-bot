@@ -1,4 +1,3 @@
-import { readFileSync } from "fs"
 import { join } from "path"
 import { timeparser } from "~/lib/timeparser"
 
@@ -11,6 +10,10 @@ import qiwi from "./data/qiwi.json"
 
 export const privates = [
   '808155036910616596'
+]
+
+export const actions = [
+  '821871687439220737'
 ]
 
 export const logs = {

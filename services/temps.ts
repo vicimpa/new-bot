@@ -36,8 +36,8 @@ export class TempRoles {
 }
 
 async function tick() {
-  const guild = await client.guilds.fetch(guildId)
-
+  const guild = client.guild
+  
   const removed = await TempModel.findRemoved()
 
 

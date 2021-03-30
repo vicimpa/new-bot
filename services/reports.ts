@@ -14,7 +14,7 @@ let accept: GuildEmoji
 let reject: GuildEmoji
 
 async function load() {
-  guild = await client.guilds.fetch(guildId)
+  guild = client.guild
   channel = await guild.channels.cache.find(e => e.id == logs.report) as TextChannel
   accept = guild.emojis.cache.find(e => e.name == 'accept')
   reject = guild.emojis.cache.find(e => e.name == 'reject')

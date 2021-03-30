@@ -6,9 +6,12 @@ import { GuildMember } from "discord.js";
 import { StoreModel } from "~/models/Store";
 import { main } from "~/lib/main";
 import { Logger } from "~/lib/logger";
+import { RolesApi } from "./roles";
+
+const roles = new RolesApi()
  
 export async function restore(member: GuildMember) {
-  const guild = await client.guilds.fetch(guildId)
+  const guild = client.guild
   const roles = await guild.roles.fetch()
   const store = await StoreModel.findOne({_id: member.id})
 
@@ -32,6 +35,7 @@ export async function restore(member: GuildMember) {
 main(__filename, () => {
   client.on('guildMemberAdd', (e) => {
     restore(e)
+      .then(() => roles.checkUser(e.id))
       .then(() => StoreModel.clear(e.id))
       .catch(e => Logger.error(e))
   })

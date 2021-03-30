@@ -77,17 +77,15 @@ class Prorole extends SlashCommand {
 
     if(!role) return {
       ephemeral: true,
-      content: `Вы не можете выдать эту роль!`
+      content: `Эта роль не выдается!`
     }
 
     const can = await api.canCheck(ctx.member.roles, role)
     const can2 = await testPermission(ctx.member.id, 'prorole.all')
 
-    Logger.log(can, can2)
-
     if(!can && !can2) return {
       ephemeral: true,
-      content: `Вы не можете выдавать про роли или Вы не являетесь проверяющим на эту роль! Обратитесь за помощью к проверяющим.`
+      content: `Вы не являетесь проверяющим на эту роль! Обратитесь за помощью к проверяющим.`
     }
 
     const status = await api.execute(type, userId, roleId)
@@ -132,4 +130,4 @@ class Prorole extends SlashCommand {
   }
 }
 
-// export = Prorole
+export = Prorole

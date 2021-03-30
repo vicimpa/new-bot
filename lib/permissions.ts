@@ -25,7 +25,7 @@ export async function testPermission(userId: string, permission: string) {
 
   try {
     const blocks = permission.split('.')
-    const guild = await client.guilds.fetch(guildId)
+    const guild = client.guild
     const member = await guild.members.fetch(userId)
     const rolesId = member.roles.cache.array().map(e => e.id)
     const data = yaml.parse(file) as IData

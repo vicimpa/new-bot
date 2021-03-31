@@ -196,6 +196,7 @@ main(__filename, async () => {
     Promise.resolve()
       .then(loadReactions)
       .then(e => {
+        
         client.on('messageReactionAdd', (e, c) => {
           if(e.message.channel.id != rolesChannel)
             return

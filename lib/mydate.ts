@@ -62,7 +62,7 @@ export class MyUTCDate extends Date {
     return ('0'.repeat(n) + v).substr(-n)
   }
 
-  format(format = '') {
+  format(format = 'DD.MM.YYYY') {
     while(true) {
       const f = re.exec(format)
       if(!f) return format

@@ -107,11 +107,11 @@ class Donate extends SlashCommand {
           
     if (donate) {
       const d = new MyDate(donate.endTime)
-      return {
+      return { 
         ephemeral: true,
         content:
           `У ${target} роль <@&${donate.roleId}>\n` +
-          `Роль действует до: \`${d.format()}\`.\n` +
+          `Роль действует до: \`${d.format('DD.MM.YYYY hh:mm:ss')}\`\n` +
           foot
       }
     } else {

@@ -5,7 +5,7 @@ import { guildId, rolesChannel } from "~/config";
 import { client } from "~/lib/commands";
 import { main } from "~/lib/main";
 import { ProroleModel } from "~/models/Prorole";
-import { register, method } from "~/lib/rpcapi";
+import { register, method, makeApi } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
 import { RoleModel } from "~/models/Role";
 import rolesStore from "~/roles.json";
@@ -192,6 +192,7 @@ async function loadReactions() {
 }
 
 main(__filename, async () => {
+  makeApi(RolesApi)
   client.on('ready', async () => {
     Promise.resolve()
       .then(loadReactions)

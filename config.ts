@@ -43,6 +43,10 @@ export const mutes = {
   voice: '805944675243917366'
 }
 
+export const onlyMedia = [
+  '813158914186805328'
+]
+
 export const sponsors = [
   {id: '805944675235397680', price: 150, name: 'Sponsor'},
   {id: '805944675235397681', price: 250, name: 'Sponsor +'},

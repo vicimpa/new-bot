@@ -18,6 +18,9 @@ permissions:
     - 'voice.notblock'
     - 'voice.notmute'
 
+  humor:
+    - 'humor.remove'
+
   user: 
     - 'donate.status'
     - 'donate.role'
@@ -84,6 +87,9 @@ groups:
     - '&805944675235397681' #sponsor +
     - '&805944675235397680' #sponsor
     - '&806967771635122188' #booster
+
+  humor:
+    - '$827270291347734578' #humor
 
   user:
     - '&805944675188867112' #everyone 

@@ -8,6 +8,7 @@ import { Logger } from "~/lib/logger";
 import { register, method, makeApi } from "~/lib/rpcapi";
 import { ApiSender } from "./sender";
 import { testPermission } from "../lib/permissions";
+import e from "express";
 
 const sender = new ApiSender()
 
@@ -108,21 +109,53 @@ main(__filename, () => {
 
   const deleted: string[] = []
 
-  client.on('messageReactionAdd', async (r, u) => {
-    if(u.bot || !await testPermission(u.id, 'humor.delete'))
-      return
+  client.ws.on('MESSAGE_REACTION_ADD',
+    async ({ member: { user }, user_id, message_id, channel_id, emoji: { name } }) => {
+      if (user.bot) return
+      if (onlyMedia.indexOf(channel_id) == -1) return
 
-    if(deleted.indexOf(r.message.id) != -1)
-      return
+      const channel = (client.channels.cache.get(channel_id) || 
+        await client.channels.fetch(channel_id)) as TextChannel
 
-    deleted.push(r.message.id)
-    r.message.delete()
-      .then(e => {
-        let index = deleted.indexOf(r.message.id)
-        if(index != -1) deleted.splice(index, 1)
-      })
-      .catch(e => Logger.error(e))
-  })
+      if(!(channel instanceof TextChannel)) return
+
+      const message = (channel.messages.cache.get(message_id)) ||
+        await channel.messages.fetch(message_id) as Message
+
+      if(!(message instanceof Message)) return
+
+      const react = message.reactions.cache.get(name)
+
+      if (name == '❌') {
+        if (!await testPermission(user_id, 'humor.remove'))
+          return react.users.remove(user_id)
+            .catch(e => Logger.error(e))
+
+        if (deleted.indexOf(message_id) != -1)
+          return react.users.remove(user_id)
+            .catch(e => Logger.error(e))
+
+        deleted.push(message_id)
+        message.delete()
+          .then(e => {
+            let index = deleted.indexOf(message_id)
+            if (index != -1) deleted.splice(index, 1)
+          })
+          .catch(e => Logger.error(e))
+      }else {
+        const like = message.reactions.cache.get('👍')
+        const dislike = message.reactions.cache.get('👎')
+
+        if(name == like.emoji.name && dislike.users.cache.has(user_id))
+          await dislike.users.remove(user_id)
+            .catch(e => Logger.error(e))
+
+        if(name == dislike.emoji.name && like.users.cache.has(user_id))
+          await like.users.remove(user_id)
+            .catch(e => Logger.error(e))
+      }
+
+    })
 
   client.on('message', (msg) => {
     const { channel } = msg

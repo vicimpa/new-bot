@@ -113,10 +113,11 @@ async function donate() {
   const pays = await PaymentModel.find({ isPay: true, isApply: false, type: 'role' })
 
   for (let p of pays) {
-    const { userId, data } = p
+    const { userId, data, amount } = p
     TempModel.appendRole(userId, data, '30D')
-      .then(e => (p.isApply = true) && p)
-      .then(e => e.save())
+      .then(() => sender.message(userId, `!Пожертвовал на роль <@&${data}>`, amount))
+      .then(() => p.isApply = true)
+      .then(() => p.save())
       .catch(e => Logger.error(e))
   }
 

@@ -3,21 +3,34 @@
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
 import { logToRoom, makeLogs } from "~/lib/makelog";
-import { MessageOptions } from "discord.js";
+import { Message, MessageOptions, TextChannel } from "discord.js";
 import { makeApi, method, register } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
 import { tempModelEvents } from "~/models/Temp";
 import { mutes, sponsors } from "~/config";
 import { remaining } from "~/lib/remaining";
 import { MyDate } from "~/lib/mydate";
+import { testPermission } from "~/lib/permissions";
 
-const fmt = 'DD.MM.YY hh:mm:ss (по МСК)'
+const fmt = 'DD.MM.YY hh:mm:ss (по МСК)' 
 
-@register()
-export class ApiSender {
-  @logToRoom(['fines'])
-  async ban(set = true, moderId: string, userId: string, reson: string) {
-    
+const code = (d = '', l = '') => '```' + l + '\n' + d.replace(/\`/g, '') + '\n```'
+
+@register() 
+export class ApiSender { 
+  @method()
+  @logToRoom(['logs'])
+  async chatLog(userId: string, channelId: string, message: string, messageNew?: string) {
+    return {
+      content: `**[chatMonitor]**`,
+      embed: {
+        color: '#ff0000',
+        description: `${messageNew ? 'Изменено' : 'Удалено'} сообщение: ${code(message)} ${messageNew ? ('на: ' + code(messageNew)) : ''} ${userId ? ('пользователя <@' + userId + '>' ) : ''} в канале <#${channelId}>`,
+        footer: {
+          text: MyDate.format(new Date(), fmt)
+        }
+      }
+    } as MessageOptions
   }
 
   @method()
@@ -26,15 +39,15 @@ export class ApiSender {
     return {
       content: `**[donate]** <@${userId}> ${amount.toFixed(2)}руб`,
       embed: {
-        description: `<@${userId}> оставил сообщение: \`\`\`${message}\`\`\``
+        description: message[0] == '!' ? message.substr(1) : `<@${userId}> оставил сообщение: ${code(message)}`
       }
     } as MessageOptions
   }
 
   @logToRoom(['donations'])
-  async donate(
+  async role(
     mode: 'add' | 'update' | 'delete',
-    userId: string, 
+    userId: string,
     roleId: string,
     deltaTime: number,
     timeEnd: number
@@ -109,7 +122,7 @@ export class ApiSender {
       }; break
     }
 
-    if (reason) description += `\n\n Причина: \`\`\`${reason}\`\`\``
+    if (reason) description += `\n\n Причина: ${code(reason)}`
 
     return {
       content: `**[mute]** <@${userId}>`,
@@ -120,7 +133,7 @@ export class ApiSender {
   }
 
   @method()
-  @logToRoom('admin')
+  @logToRoom(['logs'])
   async clearReport(chatId: string, userId: string, count: number, user?: string) {
     return {
       content: `**[clearMessage]**`,
@@ -138,7 +151,7 @@ export class ApiSender {
       content: `**[report:${reportId}]** @here`,
       embed: {
         color: '#ff0000',
-        description: `Пользователь <@${userId}> оправил на <@${reportedId}> жалобу с текстом: \`\`\`${message}\`\`\``
+        description: `Пользователь <@${userId}> оправил на <@${reportedId}> жалобу с текстом: ${code(message)}`
       }
     } as MessageOptions
   }
@@ -210,11 +223,57 @@ main(__filename, () => {
           deltaTime, moderId, reason
         ).catch(e => Logger.error(e))
 
-      if(sponsors.find(e => e.id == roleId))
-          return sender.donate( mode, userId, roleId, deltaTime, timeEnd)
+      if (sponsors.find(e => e.id == roleId))
+        return sender.role(mode, userId, roleId, deltaTime, timeEnd)
 
     }) as Parameters<(typeof tempModelEvents)['on']>[1]
   }
+
+  client.on('messageUpdate', async (d, n) => {
+    if (d.author.bot) return
+    // if(await testPermission(d.author.id, 'monitor.nolog')) return
+    sender.chatLog(d.author.id, d.channel.id, d.content, n?.content)
+      .catch(e => Logger.error(e))
+  })
+
+  client.on('messageDelete', async (d) => {
+    if (d.author.bot) return
+    // if(await testPermission(d.author.id, 'monitor.nolog')) return
+    sender.chatLog(d.author?.id, d.channel.id, d.content)
+      .catch(e => Logger.error(e))
+  })
+
+  client.ws.on('MESSAGE_DELETE', async (d) => {
+    if (!d || d.author?.bot) return
+    // if(await testPermission(d.author.id, 'monitor.nolog')) return
+
+    const v = (client.channels.cache.get(d.channel_id) ||
+      await client.channels.fetch(d.channel_id)) as TextChannel
+
+    const m = (v.messages.cache.get(d.id)) as Message
+
+    if(m) return 
+
+    sender.chatLog(d.author?.id, d.channel_id, d.content)
+      .catch(e => Logger.error(e))
+  })
+
+  client.ws.on('MESSAGE_UPDATE', async (d) => {
+    if (!d || d.author.bot) return
+    // if(await testPermission(d.author.id, 'monitor.nolog')) return
+
+    const v = (client.channels.cache.get(d.channel_id) ||
+      await client.channels.fetch(d.channel_id)) as TextChannel
+
+    const m = (v.messages.cache.get(d.id)) as Message
+
+    if(m) return
+
+    await v.messages.fetch(d.id).catch(e => null)
+
+    sender.chatLog(d.author.id, d.channel_id, '[[содержимое неизвестно]]', d.content)
+      .catch(e => Logger.error(e))
+  })
 
   tempModelEvents.on('appendRole', tempRoleEvent('add'))
   tempModelEvents.on('updateRole', tempRoleEvent('update'))

@@ -110,19 +110,22 @@ main(__filename, () => {
   const deleted: string[] = []
 
   client.ws.on('MESSAGE_REACTION_ADD',
-    async ({ member: { user }, user_id, message_id, channel_id, emoji: { name } }) => {
+    async ({ member: { user }, user_id, message_id, channel_id, emoji }) => {
+      if (!emoji) return
       if (user.bot) return
       if (onlyMedia.indexOf(channel_id) == -1) return
 
-      const channel = (client.channels.cache.get(channel_id) || 
+      const { name } = emoji
+
+      const channel = (client.channels.cache.get(channel_id) ||
         await client.channels.fetch(channel_id)) as TextChannel
 
-      if(!(channel instanceof TextChannel)) return
+      if (!(channel instanceof TextChannel)) return
 
       const message = (channel.messages.cache.get(message_id)) ||
         await channel.messages.fetch(message_id) as Message
 
-      if(!(message instanceof Message)) return
+      if (!(message instanceof Message)) return
 
       const react = message.reactions.cache.get(name)
 
@@ -142,15 +145,15 @@ main(__filename, () => {
             if (index != -1) deleted.splice(index, 1)
           })
           .catch(e => Logger.error(e))
-      }else {
+      } else {
         const like = message.reactions.cache.get('👍')
         const dislike = message.reactions.cache.get('👎')
 
-        if(name == like.emoji.name && dislike.users.cache.has(user_id))
+        if (name == like.emoji.name && dislike.users.cache.has(user_id))
           await dislike.users.remove(user_id)
             .catch(e => Logger.error(e))
 
-        if(name == dislike.emoji.name && like.users.cache.has(user_id))
+        if (name == dislike.emoji.name && like.users.cache.has(user_id))
           await like.users.remove(user_id)
             .catch(e => Logger.error(e))
       }

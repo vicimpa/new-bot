@@ -17,6 +17,7 @@ export const actions = [
 ]
 
 export const logs = {
+  logs: '827688541932617738',
   jail: '807670197740896326',
   report: '805944675743694910',
   admin:'805944675533717560',

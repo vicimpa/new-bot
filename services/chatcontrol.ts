@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import { Guild, Message, TextChannel } from "discord.js";
-import { onlyMedia } from "~/config";
+import { logs, onlyMedia } from "~/config";
 import { client } from "~/lib/control";
 import { main } from "~/lib/main";
 import { Logger } from "~/lib/logger";
@@ -9,6 +9,7 @@ import { register, method, makeApi } from "~/lib/rpcapi";
 import { ApiSender } from "./sender";
 import { testPermission } from "../lib/permissions";
 import e from "express";
+import { containsMat } from "../lib/badWords";
 
 const sender = new ApiSender()
 
@@ -159,6 +160,16 @@ main(__filename, () => {
       }
 
     })
+
+  client.on('message', (msg) => {
+    const { channel } = msg
+    if(logs.bad != channel.id) return
+    
+    if(containsMat(msg.content))
+      msg.react('💔').catch(e => {})
+    else
+      msg.react('💚').catch(e => {})
+  })
 
   client.on('message', (msg) => {
     const { channel } = msg

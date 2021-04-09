@@ -50,17 +50,14 @@ function getStoreRole(name: string) {
 export class RolesApi {
   @method()
   async canCheck(roles: string[], roleId: string) {
-    for (let key in rolesStore) {
-      const find = rolesStore[key]
-        .roles.find(e => Object
-          .values(e.ids)
-          .find(e => e == roleId))
+    for(const key in rolesStore) {
+      const find = rolesStore[key].roles
+        .find(e => e.ids.pro == roleId)
 
-      if (!find || !find.ids.check)
+      if(!find || roles.indexOf(find.ids.check) == -1) 
         continue
 
-      if (find)
-        return roles.indexOf(find.ids.check) != -1
+      return true
     }
 
     return false
@@ -70,10 +67,7 @@ export class RolesApi {
   async getEmoji(roleId: string) {
     for (let key in rolesStore) {
       const find = rolesStore[key]
-        .roles.find(e =>
-          Object
-            .values(e.ids)
-            .find(e => e == roleId))
+        .roles.find(e => e.ids.pro == roleId)
 
       if (find) return find.emoji
     }

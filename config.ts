@@ -28,7 +28,8 @@ export const logs = {
   battle: '807593935799189504',
   donations: '808458677727264819',
   voice: '808427116730515456',
-  fines: '810114604721766420'
+  fines: '810114604721766420',
+  bad: '829684581459558400'
 }
 
 export const createdName = 'Create room'

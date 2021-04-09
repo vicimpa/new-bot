@@ -80,7 +80,7 @@ class Prorole extends SlashCommand {
       content: `Эта роль не выдается!`
     }
 
-    const can = await api.canCheck(ctx.member.roles, role)
+    const can = await api.canCheck(ctx.member.roles, roleId)
     const can2 = await testPermission(ctx.member.id, 'prorole.all')
 
     if(!can && !can2) return {

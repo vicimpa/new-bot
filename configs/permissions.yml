@@ -1,6 +1,7 @@
 permissions:
   admin:
     - '*'
+    - '-prorole.all'
 
   ban:
     - '-*'

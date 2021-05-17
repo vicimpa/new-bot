@@ -162,9 +162,6 @@ class Voice extends SlashCommand {
         sender.privateBlockeSend(ctx.member.id, true, user)
           .catch(e => Logger.error(e))
 
-        if(ctx.channelID == logs.voice)
-          return
-
         return {
           ephemeral: true,
           content: `Запрет на подключение пользователя <@${user}> успешно добавлен.`
@@ -205,8 +202,6 @@ class Voice extends SlashCommand {
         sender.privateBlockeSend(ctx.member.id, false, user)
           .catch(e => Logger.error(e))        
           
-        if(ctx.channelID == logs.voice)
-          return
         return {
           ephemeral: true,
           content: `Запрет на подключение пользователя <@${user}> успешно удален.`
@@ -232,8 +227,6 @@ class Voice extends SlashCommand {
         sender.privateBlockeSend(ctx.member.id, false)
           .catch(e => Logger.error(e))
 
-        if(ctx.channelID == logs.voice)
-          return
         return {
           ephemeral: true,
           content: `Запрет на подключение всех пользователей успешно удален.`
@@ -268,10 +261,6 @@ class Voice extends SlashCommand {
       case Status.OK: {
         sender.privateMuteSend(ctx.member.id, true, user)
           .catch(e => Logger.error(e))
-
-
-        if(ctx.channelID == logs.voice)
-          return
 
         return {
           ephemeral: true,
@@ -314,9 +303,6 @@ class Voice extends SlashCommand {
         sender.privateMuteSend(ctx.member.id, false, user)
           .catch(e => Logger.error(e))
 
-        if(ctx.channelID == logs.voice)
-          return
-
         return {
           ephemeral: true,
           content: `Запрет голоса у пользователя <@${user}> успешно удален.`
@@ -342,9 +328,6 @@ class Voice extends SlashCommand {
       case Status.OK: {
         sender.privateMuteSend(ctx.member.id, false)
           .catch(e => Logger.error(e))
-        
-        if(ctx.channelID == logs.voice)
-          return
 
         return {
           ephemeral: true,

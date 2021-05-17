@@ -10,7 +10,6 @@ import { Logger } from "~/lib/logger";
 const server = new Server()
 const socketServer = SocketIO(server)
 
-
 main(__filename, () => {
   const sockets: SocketIO.Socket[] = []
 

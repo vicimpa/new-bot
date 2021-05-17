@@ -7,7 +7,8 @@ import {
   CommandOptionType, 
   CommandContext, 
   ConvertedOption, 
-  SlashCreator 
+  SlashCreator,
+  InterationResponseType
 } from "slash-create";
 import { permission } from "~/lib/permissions";
 import { Logger } from "~/lib/logger";
@@ -120,7 +121,7 @@ class Generator extends SlashCommand {
       }
 
     return {
-      ephemeral: true,
+      ephemeral: true, 
       content: `Ваш пароль длиной в ${length} символов: \`${password(length)}\``
     }
   }

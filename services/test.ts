@@ -4,5 +4,4 @@ import { main } from "~/lib/main";
 import { logs } from "~/config";
 
 main(__filename, () => {
-  client
 })

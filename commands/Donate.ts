@@ -12,7 +12,7 @@ import { TempRoles } from "~/services/temps"
 import { MyDate } from "~/lib/mydate"
 import { QiwiPaymentsAPI } from "@vicimpa/qiwi-sdk";
 import { PaymentModel } from "~/models/Payment";
-import { timeparser } from "../lib/timeparser"
+import { timeparser } from "~/lib/timeparser"
 
 const {
   INTEGER: Int,
@@ -174,7 +174,7 @@ class Donate extends SlashCommand {
   async message(ctx: CommandContext, opt: ConvertedOption) {
     const { message = '', sum = 0 } = opt as any
     const donate = await api.getDonate(ctx.member.id)
-    const min = donate ? 10 : 50
+    const min = donate ? 10 : 30
     const amount = 0 || sum
 
     if (sum < min)

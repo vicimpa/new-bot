@@ -41,6 +41,7 @@ permissions:
     - 'voice.mutelist'
     - 'voice.unmute'
     - 'voice.unmuteall'
+    - 'start.app'
 
 groups:
   social:
@@ -79,7 +80,7 @@ groups:
   moder:
     - '&805944675243917368' #moder
     - '&805944675243917369' #support
-    - '681736660572045413'  #PromiSe (Twink)
+    # - '681736660572045413'  #PromiSe (Twink)
     - '770721580464209992'  #HellCommands
     - '769589561386467329'  #HellControll
 
@@ -90,7 +91,7 @@ groups:
     - '&806967771635122188' #booster
 
   humor:
-    - '$827270291347734578' #humor
+    - '&827270291347734578' #humor
 
   user:
     - '&805944675188867112' #everyone 

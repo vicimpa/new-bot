@@ -158,18 +158,17 @@ main(__filename, () => {
           await like.users.remove(user_id)
             .catch(e => Logger.error(e))
       }
-
     })
 
-  client.on('message', (msg) => {
-    const { channel } = msg
-    if(logs.bad != channel.id) return
+  // client.on('message', (msg) => {
+  //   const { channel } = msg
+  //   if(logs.bad != channel.id) return
     
-    if(containsMat(msg.content))
-      msg.react('💔').catch(e => {})
-    else
-      msg.react('💚').catch(e => {})
-  })
+  //   if(containsMat(msg.content))
+  //     msg.react('💔').catch(e => {})
+  //   else
+  //     msg.react('💚').catch(e => {})
+  // })
 
   client.on('message', (msg) => {
     const { channel } = msg

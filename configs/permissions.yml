@@ -1,6 +1,7 @@
 permissions:
   admin:
     - '*'
+    - '-report.moder'
     - '-prorole.all'
 
   ban:
@@ -8,6 +9,7 @@ permissions:
 
   moder:
     # - '-report.moder'
+    - '-report.moder'
     - '-temps.role'
     - '-prorole.all'
     - '*'

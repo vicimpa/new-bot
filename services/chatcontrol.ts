@@ -8,8 +8,6 @@ import { Logger } from "~/lib/logger";
 import { register, method, makeApi } from "~/lib/rpcapi";
 import { ApiSender } from "./sender";
 import { testPermission } from "../lib/permissions";
-import e from "express";
-import { containsMat } from "../lib/badWords";
 
 const sender = new ApiSender()
 

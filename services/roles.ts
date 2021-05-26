@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
-import { GuildMember, Role, TextChannel } from "discord.js";
-import { guildId, rolesChannel } from "~/config";
+import { GuildMember, TextChannel } from "discord.js";
+import { rolesChannel } from "~/config";
 import { client } from "~/lib/commands";
 import { main } from "~/lib/main";
 import { ProroleModel } from "~/models/Prorole";

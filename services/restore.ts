@@ -1,7 +1,6 @@
 #!/usr/bin/env ts-node
 
 import { client } from "~/lib/control";
-import { guildId } from "~/config";
 import { GuildMember } from "discord.js";
 import { StoreModel } from "~/models/Store";
 import { main } from "~/lib/main";

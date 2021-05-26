@@ -84,7 +84,7 @@ async function addReaction(msg: MessageReaction, user: User) {
   if(msg.message.channel.id != logs.report) return
   if(!regExpId.test(msg.message.content)) return
   if(!await testPermission(user.id, 'report.moder')) {
-    msg.remove().catch(e => Logger.error(e))
+    msg.users.remove(user).catch(e => Logger.error(e))
     return
   }
 

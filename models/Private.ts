@@ -1,35 +1,35 @@
-import { schema, field, Base, makeModel, method } from "~/lib/mongoose";
 import { Logger } from "~/lib/logger";
+import { Base, field, makeModel, method, schema } from "~/lib/mongoose";
 
 @schema()
 class Private extends Base {
   @field(String)
-  _id: string
+  _id: string;
 
   @field({ type: String, required: true })
-  name: string
+  name: string;
 
   @field({ type: Number, default: 0 })
-  limit: number
+  limit: number;
 
   @field({ type: Array, default: [] })
-  blocks: string[]
+  blocks: string[];
 
   @field({ type: Array, default: [] })
-  mutes: string[]
+  mutes: string[];
 
   @field({ type: Date, default: Date.now })
-  created: Date
+  created: Date;
 
   @method()
   updateProps(d: Partial<Private>) {
-    for(let key in d)
-      this[key] = d[key]
+    for (let key in d)
+      this[key] = d[key];
   }
 }
 
 export class PrivateModel extends makeModel(Private) {
-  static async updatePrivate(_id: string, 
+  static async updatePrivate(_id: string,
     {
       name = '',
       limit = 0,
@@ -37,12 +37,12 @@ export class PrivateModel extends makeModel(Private) {
       mutes = []
     }
   ) {
-    const find = await this.findOne({ _id }) || new this({ _id })
-    find.updateProps({ name, limit, blocks, mutes })
-    await find.save().catch(e => Logger.error(e))
+    const find = await this.findOne({ _id }) || new this({ _id });
+    find.updateProps({ name, limit, blocks, mutes });
+    await find.save().catch(e => Logger.error(e));
   }
 
   static async get(_id: string) {
-    return await this.findOne({ _id })
+    return await this.findOne({ _id });
   }
 }

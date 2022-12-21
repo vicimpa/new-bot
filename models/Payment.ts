@@ -3,27 +3,27 @@ import { Base, field, makeModel, schema } from "~/lib/mongoose";
 @schema()
 class Payment extends Base {
   @field(String)
-  type: 'role' | 'message'
+  type: 'role' | 'message';
 
   @field(Object)
-  data: string
+  data: string;
 
   @field(String)
-  userId: string
+  userId: string;
 
-  @field({type: Number, default: 0})
-  amount: number
+  @field({ type: Number, default: 0 })
+  amount: number;
 
   @field({ type: Date, default: Date.now })
-  crated: Date
+  crated: Date;
 
-  @field({type: Boolean, default: false})
-  isPay: boolean
+  @field({ type: Boolean, default: false })
+  isPay: boolean;
 
-  @field({type: Boolean, default: false})
-  isApply: boolean
+  @field({ type: Boolean, default: false })
+  isApply: boolean;
 }
 
 export class PaymentModel extends makeModel(Payment) {
-  
+
 }

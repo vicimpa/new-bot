@@ -1,25 +1,18 @@
-import { guildId } from "~/config"
-import {
-  SlashCommand,
-  CommandOptionType,
-  CommandContext,
-  ConvertedOption,
-  SlashCreator
-} from "slash-create";
-
-import { permission } from "~/lib/permissions";
-import { Logger } from "~/lib/logger";
-import { client } from "~/lib/control";
 import { Invite, VoiceChannel } from "discord.js";
+import { CommandContext, CommandOptionType, ConvertedOption, SlashCommand, SlashCreator } from "slash-create";
+import { guildId } from "~/config";
+import { client } from "~/lib/control";
+import { Logger } from "~/lib/logger";
+import { permission } from "~/lib/permissions";
 
 const {
   STRING: Str,
   SUB_COMMAND: Sub
-} = CommandOptionType
+} = CommandOptionType;
 
 class Games extends SlashCommand {
-  filePath = __filename
-  guildID = guildId
+  filePath = __filename;
+  guildID = guildId;
 
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -47,56 +40,56 @@ class Games extends SlashCommand {
           ]
         }
       ]
-    })
+    });
   }
 
   // APP ===
   @permission('start.app')
   async app(ctx: CommandContext, opt: ConvertedOption) {
-    const { appid: appId = '' } = opt as any
-    const userId = ctx.member.id
+    const { appid: appId = '' } = opt as any;
+    const userId = ctx.member.id;
 
     const voice = client.guild.channels.cache
-      .find(e => e instanceof VoiceChannel && !!e.members.find(e => e.id == userId))
+      .find(e => e instanceof VoiceChannel && !!e.members.find(e => e.id == userId));
 
     if (!voice) return {
       ephemeral: true,
       content: 'Для работы приложения, Вы должны находится в голосовом канале!'
-    }
+    };
 
-    const invite = new Invite(client, 
+    const invite = new Invite(client,
       await client['api']['channels'](voice.id)
         .invites.post({
           data: {
             target_type: 2,
             target_application_id: appId
           },
-        }))
+        }));
 
     return {
       ephemeral: true,
       content: `Для запуска нажмите [сюда](${invite}).`
-    }
+    };
   }
 
   async run(ctx: CommandContext) {
-    const { options } = ctx
+    const { options } = ctx;
 
     try {
       for (let key in options)
         if (typeof this[key] == 'function')
           if (this[key].name == 'value')
-            return await this[key](ctx, options[key])
+            return await this[key](ctx, options[key]);
 
-      throw new Error('No method!')
+      throw new Error('No method!');
     } catch (e) {
-      Logger.error(e)
+      Logger.error(e);
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`
-      }
+      };
     }
   }
 }
 
-export = Games
+export = Games;

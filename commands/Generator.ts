@@ -1,26 +1,19 @@
 import genName from "@vicimpa/nick-name";
+import { CommandContext, CommandOptionType, ConvertedOption, SlashCommand, SlashCreator } from "slash-create";
 import { guildId } from "~/config";
-import { password } from "~/lib/password";
-import { rand } from "~/lib/rand";
-import { 
-  SlashCommand, 
-  CommandOptionType, 
-  CommandContext, 
-  ConvertedOption, 
-  SlashCreator,
-  InterationResponseType
-} from "slash-create";
-import { permission } from "~/lib/permissions";
 import { Logger } from "~/lib/logger";
+import { password } from "~/lib/password";
+import { permission } from "~/lib/permissions";
+import { rand } from "~/lib/rand";
 
 const {
   INTEGER: Int,
   SUB_COMMAND: Sub
-} = CommandOptionType
+} = CommandOptionType;
 
 class Generator extends SlashCommand {
-  filePath = __filename
-  guildID = guildId
+  filePath = __filename;
+  guildID = guildId;
 
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -91,75 +84,75 @@ class Generator extends SlashCommand {
           ]
         }
       ]
-    })
+    });
   }
 
   @permission('generator.nick')
   async nick(ctx: CommandContext, opt: ConvertedOption) {
-    const { method = 1, length = 5 } = opt as any // edit length = undefined -> length = 5
+    const { method = 1, length = 5 } = opt as any; // edit length = undefined -> length = 5
 
     if (length && (length < 3 || length > 15))
       return {
         ephemeral: true,
         content: `Длина ника должна быть от 3 до 15`
-      }
+      };
 
     return {
       ephemeral: true,
       content: `Ваш ник длиной ${length} и сложностью ${method}: \`${genName(method, length)}\``
-    }
+    };
   }
 
   @permission('generator.pass')
   async pass(ctx: CommandContext, opt: ConvertedOption) {
-    const { length = 8 } = opt as any
+    const { length = 8 } = opt as any;
 
     if (length < 1 || length > 32)
       return {
         ephemeral: true,
         content: `Длина пароля должна быть от 1 до 32`
-      }
+      };
 
     return {
-      ephemeral: true, 
+      ephemeral: true,
       content: `Ваш пароль длиной в ${length} символов: \`${password(length)}\``
-    }
+    };
   }
 
   @permission('generator.rand')
   async rand(ctx: CommandContext, opt: ConvertedOption) {
-    const {one = Number.MAX_SAFE_INTEGER, two = 0} = opt as any
+    const { one = Number.MAX_SAFE_INTEGER, two = 0 } = opt as any;
 
-    if(isNaN(one) || isNaN(two))
+    if (isNaN(one) || isNaN(two))
       return {
         ephemeral: true,
         content: 'Один из аргументов не число!'
-      }
+      };
 
     return {
       ephemeral: true,
       content: `Ваше число в диапазоне (${one} - ${two}): \`${rand(one, two)}\``
-    }
+    };
   }
 
   async run(ctx: CommandContext) {
-    const { options } = ctx
+    const { options } = ctx;
 
     try {
       for (let key in options)
         if (typeof this[key] == 'function')
           if (this[key].name == 'value')
-            return await this[key](ctx, options[key])
+            return await this[key](ctx, options[key]);
 
-      throw new Error('No method!')
+      throw new Error('No method!');
     } catch (e) {
-      Logger.error(e)
+      Logger.error(e);
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`
-      }
+      };
     }
   }
 }
 
-export = Generator
+export = Generator;

@@ -1,17 +1,10 @@
-import { guildId } from "~/config"
-import {
-  SlashCommand,
-  CommandOptionType,
-  CommandContext,
-  SlashCreator
-} from "slash-create";
-
-import { permission } from "~/lib/permissions";
-import { ApiSender } from "~/services/sender";
+import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from "slash-create";
+import { guildId } from "~/config";
 import { Logger } from "~/lib/logger";
+import { permission } from "~/lib/permissions";
 import { TempRoles } from "~/services/temps";
 
-const api = new TempRoles()
+const api = new TempRoles();
 
 const {
   INTEGER: Int,
@@ -19,11 +12,11 @@ const {
   USER: User,
   ROLE: Role,
   SUB_COMMAND: Sub
-} = CommandOptionType
+} = CommandOptionType;
 
 class Temp extends SlashCommand {
-  filePath = __filename
-  guildID = guildId
+  filePath = __filename;
+  guildID = guildId;
 
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -49,27 +42,27 @@ class Temp extends SlashCommand {
           required: true
         }
       ]
-    })
+    });
   }
 
   @permission('temps.role')
   async run(ctx: CommandContext) {
-    const { options } = ctx
+    const { options } = ctx;
 
-    const {user = '', role = '', time = ''} = options as any
+    const { user = '', role = '', time = '' } = options as any;
 
     try {
       api.append(user, role, time, ctx.member.id)
-        .catch(e => Logger.error(e))
-    }catch(e) {
-      Logger.error(e)
+        .catch(e => Logger.error(e));
+    } catch (e) {
+      Logger.error(e);
     }
-    
+
     return {
       ephemeral: true,
       content: 'Выполнено.'
-    }
+    };
   }
 }
 
-export = Temp
+export = Temp;

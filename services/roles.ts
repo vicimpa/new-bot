@@ -1,12 +1,11 @@
 #!/usr/bin/env ts-node
-
 import { GuildMember, TextChannel } from "discord.js";
 import { rolesChannel } from "~/config";
 import { client } from "~/lib/commands";
-import { main } from "~/lib/main";
-import { ProroleModel } from "~/models/Prorole";
-import { register, method, makeApi } from "~/lib/rpcapi";
 import { Logger } from "~/lib/logger";
+import { main } from "~/lib/main";
+import { makeApi, method, register } from "~/lib/rpcapi";
+import { ProroleModel } from "~/models/Prorole";
 import { RoleModel } from "~/models/Role";
 import rolesStore from "~/roles.json";
 
@@ -17,206 +16,206 @@ enum Status {
   UNKNOW_ERROR
 }
 
-const checkedRoles: string[] = []
-const cheksRole: string[] = []
-const proRoles: string[][] = []
+const checkedRoles: string[] = [];
+const cheksRole: string[] = [];
+const proRoles: string[][] = [];
 
-for(let key in rolesStore) {
-  for(let role of rolesStore[key].roles) {
-    for(let k in role.ids) {
-      if(k != 'check')
-        checkedRoles.push(role.ids[k])
+for (let key in rolesStore) {
+  for (let role of rolesStore[key].roles) {
+    for (let k in role.ids) {
+      if (k != 'check')
+        checkedRoles.push(role.ids[k]);
       else
-        cheksRole.push(role.ids[k])
+        cheksRole.push(role.ids[k]);
 
-      if(k == 'pro')
-        proRoles.push([role.ids[k], role.emoji])
+      if (k == 'pro')
+        proRoles.push([role.ids[k], role.emoji]);
     }
   }
 }
 
 function getStoreRole(name: string) {
-  for(let key in rolesStore) {
-    for(let role of rolesStore[key].roles) {
-      if(role.emoji == name)
-        return role
+  for (let key in rolesStore) {
+    for (let role of rolesStore[key].roles) {
+      if (role.emoji == name)
+        return role;
     }
   }
 
-  return null
+  return null;
 }
 
 @register()
 export class RolesApi {
   @method()
   async canCheck(roles: string[], roleId: string) {
-    for(const key in rolesStore) {
+    for (const key in rolesStore) {
       const find = rolesStore[key].roles
-        .find(e => e.ids.pro == roleId)
+        .find(e => e.ids.pro == roleId);
 
-      if(!find || roles.indexOf(find.ids.check) == -1) 
-        continue
+      if (!find || roles.indexOf(find.ids.check) == -1)
+        continue;
 
-      return true
+      return true;
     }
 
-    return false
+    return false;
   }
 
   @method()
   async getEmoji(roleId: string) {
     for (let key in rolesStore) {
       const find = rolesStore[key]
-        .roles.find(e => e.ids.pro == roleId)
+        .roles.find(e => e.ids.pro == roleId);
 
-      if (find) return find.emoji
+      if (find) return find.emoji;
     }
 
-    return ''
+    return '';
   }
 
   @method()
   async execute(type: 'append' | 'remove', userId: string, roleId: string) {
-    const emoji = await this.getEmoji(roleId)
-    const guild = client.guild
+    const emoji = await this.getEmoji(roleId);
+    const guild = client.guild;
 
     try {
-      const user = await ProroleModel.getUser(userId)
+      const user = await ProroleModel.getUser(userId);
 
       if (type == 'append') {
         if (user.check(emoji))
-          return Status.ROLE_EXISTS
+          return Status.ROLE_EXISTS;
 
-        await user.addRole(emoji)
+        await user.addRole(emoji);
       } else
         if (type == 'remove') {
           if (!user.check(emoji))
-            return Status.ROLE_EXISTS
+            return Status.ROLE_EXISTS;
 
-          await user.delRole(emoji)
+          await user.delRole(emoji);
         } else {
-          return Status.NO_METHOD
+          return Status.NO_METHOD;
         }
-        const member = await guild.members.fetch(userId)
-        this.checkUser(member.id)
-          .catch(e => null)
-      return Status.OK
+      const member = await guild.members.fetch(userId);
+      this.checkUser(member.id)
+        .catch(e => null);
+      return Status.OK;
     } catch (e) {
-      return Status.UNKNOW_ERROR
+      return Status.UNKNOW_ERROR;
     }
   }
 
   @method()
   async checkUser(user: string) {
-    await checkUser(user)
+    await checkUser(user);
   }
 
-  static Status = Status
+  static Status = Status;
 }
 
 async function checkUser(user: GuildMember | string) {
-  const guild = client.guild
-  const userId = (user instanceof GuildMember) ? user.id : user
+  const guild = client.guild;
+  const userId = (user instanceof GuildMember) ? user.id : user;
   const member = guild.members.cache.get(userId) || await guild.members.fetch(userId)
-    .catch(e => null as GuildMember)
+    .catch(e => null as GuildMember);
 
-  if(!member) return null
-  const needRoles = await RoleModel.getRolesById(userId)
-  const proRoles = await ProroleModel.getRolesById(userId)
+  if (!member) return null;
+  const needRoles = await RoleModel.getRolesById(userId);
+  const proRoles = await ProroleModel.getRolesById(userId);
   const currentNeed = needRoles
     .map(e => getStoreRole(e))
     // .filter(e => !member.roles.cache.get(e.ids.check))
-    .map(e => e.ids[proRoles.indexOf(e.emoji) == -1 ? 'def' : 'pro'])
+    .map(e => e.ids[proRoles.indexOf(e.emoji) == -1 ? 'def' : 'pro']);
 
-  for(let role of checkedRoles) {
-    const inUser = !!member.roles.cache.get(role)
+  for (let role of checkedRoles) {
+    const inUser = !!member.roles.cache.get(role);
 
-    if(inUser && currentNeed.indexOf(role) == -1) {
-      console.log(`Delete ${role} => ${user}`)
+    if (inUser && currentNeed.indexOf(role) == -1) {
+      console.log(`Delete ${role} => ${user}`);
       member.roles.remove(role)
-        .catch(e => {})
+        .catch(e => { });
     }
 
-    if(!inUser && currentNeed.indexOf(role) != -1) {
-      console.log(`Append ${role} => ${user}`)
+    if (!inUser && currentNeed.indexOf(role) != -1) {
+      console.log(`Append ${role} => ${user}`);
       member.roles.add(role)
-        .catch(e => {})
+        .catch(e => { });
     }
   }
 }
 
 async function loadReactions() {
-  Logger.log('Start load reactions')
-  const guild = client.guild
-  const channel = guild.channels.cache.get(rolesChannel) as TextChannel
-  const updateUsers: string[] = []
+  Logger.log('Start load reactions');
+  const guild = client.guild;
+  const channel = guild.channels.cache.get(rolesChannel) as TextChannel;
+  const updateUsers: string[] = [];
 
-  for(let msg of (await channel.messages.fetch()).array()) {
-    for(let react of msg.reactions.cache.array()) {
-      let count = 0, last: string = undefined
+  for (let msg of (await channel.messages.fetch()).array()) {
+    for (let react of msg.reactions.cache.array()) {
+      let count = 0, last: string = undefined;
 
-      while(count < react.count) {
-        const users = (await react.users.fetch({limit: 50, after: last})).array()
-        for(let user of users) {
+      while (count < react.count) {
+        const users = (await react.users.fetch({ limit: 50, after: last })).array();
+        for (let user of users) {
           RoleModel.setRole(user.id, react.emoji.name)
-            .catch(e => Logger.error(e))
+            .catch(e => Logger.error(e));
 
-          if(updateUsers.indexOf(user.id) == -1)
-            updateUsers.push(user.id)
+          if (updateUsers.indexOf(user.id) == -1)
+            updateUsers.push(user.id);
 
-          last = user.id
-          count++
+          last = user.id;
+          count++;
         }
-        Logger.log(`Loaded reactions for ${react.emoji.name} count ${users.length}`)
+        Logger.log(`Loaded reactions for ${react.emoji.name} count ${users.length}`);
       }
     }
   }
-  
-  Logger.log('Load reactions end')
 
-  Logger.log('Update users start')
+  Logger.log('Load reactions end');
+
+  Logger.log('Update users start');
 
   Promise.resolve()
     .then(async () => {
-      for(let userId of updateUsers)
+      for (let userId of updateUsers)
         await checkUser(userId)
-          .catch(e => Logger.error(e))
+          .catch(e => Logger.error(e));
     })
-    .then(e => Logger.log('Update users end'))
+    .then(e => Logger.log('Update users end'));
 }
 
 main(__filename, async () => {
-  makeApi(RolesApi)
+  makeApi(RolesApi);
   client.on('ready', async () => {
     Promise.resolve()
       .then(loadReactions)
       .then(e => {
-        
-        client.on('messageReactionAdd', (e, c) => {
-          if(e.message.channel.id != rolesChannel)
-            return
 
-          if(!getStoreRole(e.emoji.name))
-            return
+        client.on('messageReactionAdd', (e, c) => {
+          if (e.message.channel.id != rolesChannel)
+            return;
+
+          if (!getStoreRole(e.emoji.name))
+            return;
 
           Promise.resolve()
             .then(() => RoleModel.setRole(c.id, e.emoji.name))
             .then(e => checkUser(c.id))
-            .catch(e => Logger.error(e))
-        })
-        
-        client.on('messageReactionRemove', (e, c) => {
-          if(e.message.channel.id != rolesChannel)
-            return
+            .catch(e => Logger.error(e));
+        });
 
-          if(!getStoreRole(e.emoji.name))
-            return
-          
+        client.on('messageReactionRemove', (e, c) => {
+          if (e.message.channel.id != rolesChannel)
+            return;
+
+          if (!getStoreRole(e.emoji.name))
+            return;
+
           Promise.resolve()
             .then(() => RoleModel.unsetRole(c.id, e.emoji.name))
             .then(e => checkUser(c.id))
-            .catch(e => Logger.error(e))
-        })
-      })
-  })    
-})
+            .catch(e => Logger.error(e));
+        });
+      });
+  });
+});

@@ -1,25 +1,16 @@
-import { guildId } from "~/config"
-import {
-  SlashCommand,
-  CommandOptionType,
-  CommandContext,
-  ConvertedOption,
-  SlashCreator
-} from "slash-create";
-import {
-  permission,
-  testPermission
-} from "~/lib/permissions";
+import { CommandContext, CommandOptionType, ConvertedOption, SlashCommand, SlashCreator } from "slash-create";
+import { guildId } from "~/config";
+import { Logger } from "~/lib/logger";
+import { permission, testPermission } from "~/lib/permissions";
 import { RolesApi } from "~/services/roles";
 import { ApiSender } from "~/services/sender";
-import { Logger } from "~/lib/logger";
 
-const api = new RolesApi()
-const sender = new ApiSender()
+const api = new RolesApi();
+const sender = new ApiSender();
 
 const {
   Status
-} = RolesApi
+} = RolesApi;
 
 const {
   INTEGER: Int,
@@ -27,11 +18,11 @@ const {
   USER: User,
   ROLE: Role,
   SUB_COMMAND: Sub
-} = CommandOptionType
+} = CommandOptionType;
 
 class Prorole extends SlashCommand {
-  filePath = __filename
-  guildID = guildId
+  filePath = __filename;
+  guildID = guildId;
 
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -62,7 +53,7 @@ class Prorole extends SlashCommand {
           description: 'Роль'
         }
       ]
-    })
+    });
   }
 
   @permission('prorole.base')
@@ -70,64 +61,64 @@ class Prorole extends SlashCommand {
     const { type, user: userId, role: roleId } = opt as {
       type: 'append' | 'remove',
       user: string,
-      role: string
-    }
+      role: string;
+    };
 
-    const role = await api.getEmoji(roleId)
+    const role = await api.getEmoji(roleId);
 
-    if(!role) return {
+    if (!role) return {
       ephemeral: true,
       content: `Эта роль не выдается!`
-    }
+    };
 
-    const can = await api.canCheck(ctx.member.roles, roleId)
-    const can2 = await testPermission(ctx.member.id, 'prorole.all')
+    const can = await api.canCheck(ctx.member.roles, roleId);
+    const can2 = await testPermission(ctx.member.id, 'prorole.all');
 
-    if(!can && !can2) return {
+    if (!can && !can2) return {
       ephemeral: true,
       content: `Вы не являетесь проверяющим на эту роль! Обратитесь за помощью к проверяющим.`
-    }
+    };
 
-    const status = await api.execute(type, userId, roleId)
-    const typeName = type == 'append' ? 'добавлена' : 'удалена'
+    const status = await api.execute(type, userId, roleId);
+    const typeName = type == 'append' ? 'добавлена' : 'удалена';
 
-    switch(status) {
+    switch (status) {
       case Status.OK: {
         sender.proRole(ctx.member.id, userId, roleId, type == 'append')
-          .catch(e => Logger.error(e))
-          
+          .catch(e => Logger.error(e));
+
         return {
           ephemeral: true,
           content: `Роль <@&${roleId}> пользователю <@${userId}> успешно ${typeName}!`
-        }
+        };
       }
 
       case Status.ROLE_EXISTS:
         return {
           ephemeral: true,
           content: `Роль <@&${roleId}> у пользователя <@${userId}> уже ${typeName}!`
-        }
+        };
 
       case Status.NO_METHOD:
-        throw new Error('No method')
+        throw new Error('No method');
 
       default:
-        throw new Error('Unknow error')
+        throw new Error('Unknow error');
     }
   }
 
   async run(ctx: CommandContext) {
-    const { options } = ctx
+    const { options } = ctx;
 
     return this.pro(ctx, options)
       .catch(e => {
-        Logger.error(e)
+        Logger.error(e);
         return {
           ephemeral: true,
           content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`
-        }
-      })
+        };
+      });
   }
 }
 
-export = Prorole
+export = Prorole;

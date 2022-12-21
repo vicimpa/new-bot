@@ -1,48 +1,48 @@
-import { Base, field, schema, makeModel } from "~/lib/mongoose";
+import { Base, field, makeModel, schema } from "~/lib/mongoose";
 
 @schema()
 class Store extends Base {
   @field(String)
-  _id: String
+  _id: String;
 
   @field({ type: Array, default: [] })
-  roles: string[]
+  roles: string[];
 
   @field({ type: String, default: '' })
-  name: string
+  name: string;
 
   @field({ type: Date, default: Date.now })
-  created: Date
+  created: Date;
 }
 
 export class StoreModel extends makeModel(Store) {
   static async delRole(_id: string, roleId: string) {
-    let find = await this.findOne({ _id })
-    if (!find) return
-    find.roles = find.roles.filter(e => e != roleId)
-    await find.save()
+    let find = await this.findOne({ _id });
+    if (!find) return;
+    find.roles = find.roles.filter(e => e != roleId);
+    await find.save();
   }
 
   static async clear(_id: string) {
-    let find = await this.findOne({ _id })
-    if (find) await find.delete()
+    let find = await this.findOne({ _id });
+    if (find) await find.delete();
   }
 
   static async stored(_id: string, name: string, roles: string[]) {
-    let find = await this.findOne({ _id })
+    let find = await this.findOne({ _id });
 
     if (!find)
-      find = new this({ _id, roles, name })
+      find = new this({ _id, roles, name });
 
-    await find.save()
+    await find.save();
   }
 
   static async delRoles(_id: string) {
-    let role = await this.find({ _id })
+    let role = await this.find({ _id });
 
-    if (!role.length) return
+    if (!role.length) return;
 
     for (let r of role)
-      await r.delete()
+      await r.delete();
   }
 }

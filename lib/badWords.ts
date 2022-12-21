@@ -27,7 +27,7 @@ export const badPatterns = [
   ".*(д(о|а)лб(о|а)|разъ|разь|за|вы|по)ебы*.*",
   ".*пид(а|о|е)р.*",
   ".*хер.*"
-]
+];
 
 export const goodPatterns = [
   ".*психу.*",
@@ -41,7 +41,7 @@ export const goodPatterns = [
   ".*п(о|а)тр(е|и)блять.*",
   ".*@.*\\.(ру|сом|нет)$",
   "манд(а|о)рин"
-]
+];
 
 export const goodWords = [
   "дезмонда",
@@ -50,7 +50,7 @@ export const goodWords = [
   "подстрахуй",
   "психуй",
   "йоп"
-]
+];
 
 export const letters = {
   "a": "а",
@@ -82,103 +82,103 @@ export const letters = {
 };
 
 export const containsMat = function (text = '') {
-  text = cleanBadSymbols(text.toLowerCase())
+  text = cleanBadSymbols(text.toLowerCase());
 
-  const words = text.split(/\s+/)
+  const words = text.split(/\s+/);
 
   for (let i = 0; i < words.length; i++) {
-    const word = convertEngToRus(words[i])
+    const word = convertEngToRus(words[i]);
 
-    if (isInGoodWords(word) && isInGoodPatterns(word)) continue
-    if (isInBadPatterns(word)) return true
+    if (isInGoodWords(word) && isInGoodPatterns(word)) continue;
+    if (isInBadPatterns(word)) return true;
   }
 
-  if (containsMatInSpaceWords(words)) return true
+  if (containsMatInSpaceWords(words)) return true;
 
-  return false
-}
+  return false;
+};
 
 export const convertEngToRus = function (word) {
   for (let j = 0; j < word.length; j++) {
     for (const key in letters) {
       if (word.charAt(j) == key)
-        word = word.substring(0, j) + letters[key] + word.substring(j + 1, word.length)
+        word = word.substring(0, j) + letters[key] + word.substring(j + 1, word.length);
     }
   }
 
-  return word
-}
+  return word;
+};
 
 export const cleanBadSymbols = function (text = '') {
-  return text.replace(/[^a-zA-Zа-яА-Яё0-9\s]/g, "").replace(/(\D)\1+/, '$1')
-}
+  return text.replace(/[^a-zA-Zа-яА-Яё0-9\s]/g, "").replace(/(\D)\1+/, '$1');
+};
 
 export const isInGoodWords = function (word = '') {
   for (let i = 0; i < goodWords.length; i++) {
-    if (word == goodWords[i]) return true
+    if (word == goodWords[i]) return true;
   }
 
-  return false
-}
+  return false;
+};
 
 export const isInGoodPatterns = function (word = '') {
   for (let i = 0; i < goodPatterns.length; i++) {
-    const pattern = new RegExp(goodPatterns[i])
-    if (pattern.test(word)) return true
+    const pattern = new RegExp(goodPatterns[i]);
+    if (pattern.test(word)) return true;
   }
 
-  return false
-}
+  return false;
+};
 
 export const isInBadPatterns = function (word = '') {
   for (let i = 0; i < badPatterns.length; i++) {
-    const pattern = new RegExp(badPatterns[i])
-    if (pattern.test(word)) return true
+    const pattern = new RegExp(badPatterns[i]);
+    if (pattern.test(word)) return true;
   }
 
-  return false
-}
+  return false;
+};
 
 export const containsMatInSpaceWords = function (words: string[]) {
-  const spaceWords = findSpaceWords(words)
+  const spaceWords = findSpaceWords(words);
 
   for (let i = 0; i < spaceWords.length; i++) {
-    const word = convertEngToRus(spaceWords[i])
-    if (isInBadPatterns(word)) return true
+    const word = convertEngToRus(spaceWords[i]);
+    if (isInBadPatterns(word)) return true;
   }
 
-  return false
-}
+  return false;
+};
 
 export const findSpaceWords = function (words: string[]) {
-  const out = []
-  let spaceWord = ""
+  const out = [];
+  let spaceWord = "";
 
   for (let i = 0; i < words.length; i++) {
-    const word = words[i]
+    const word = words[i];
 
     if (word.length <= 3) {
-      spaceWord += word
-      continue
+      spaceWord += word;
+      continue;
     }
 
     if (spaceWord.length >= 3) {
-      out.push(spaceWord)
-      spaceWord = ""
+      out.push(spaceWord);
+      spaceWord = "";
     }
   }
 
-  return out
-}
+  return out;
+};
 
 export const addBadPattern = function (pattern = '') {
-  badPatterns.push(pattern)
-}
+  badPatterns.push(pattern);
+};
 
 export const addGoodPattern = function (pattern = '') {
-  goodPatterns.push(pattern)
-}
+  goodPatterns.push(pattern);
+};
 
 export const addGoodWord = function (pattern = '') {
-  goodWords.push(pattern)
-}
+  goodWords.push(pattern);
+};

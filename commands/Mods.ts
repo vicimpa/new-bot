@@ -1,32 +1,26 @@
-import { guildId, mutes } from "~/config"
-import {
-  SlashCommand,
-  CommandOptionType,
-  CommandContext,
-  ConvertedOption,
-  SlashCreator
-} from "slash-create";
-import { permission, testPermission } from "~/lib/permissions";
+import { CommandContext, CommandOptionType, ConvertedOption, SlashCommand, SlashCreator } from "slash-create";
+import { guildId, mutes } from "~/config";
 import { Logger } from "~/lib/logger";
-import { TempRoles } from "~/services/temps";
+import { permission, testPermission } from "~/lib/permissions";
+import { timeparser } from "~/lib/timeparser";
 import { ChatControl } from "~/services/chatcontrol";
 import { ApiSender } from "~/services/sender";
-import { timeparser } from "~/lib/timeparser";
+import { TempRoles } from "~/services/temps";
 
 const {
   INTEGER: Int,
   STRING: Str,
   USER: User,
   SUB_COMMAND: Sub
-} = CommandOptionType
+} = CommandOptionType;
 
-const api = new TempRoles()
-const sender = new ApiSender()
-const chat = new ChatControl()
+const api = new TempRoles();
+const sender = new ApiSender();
+const chat = new ChatControl();
 
 class Mods extends SlashCommand {
-  filePath = __filename
-  guildID = guildId
+  filePath = __filename;
+  guildID = guildId;
 
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -180,145 +174,145 @@ class Mods extends SlashCommand {
           ]
         }
       ]
-    })
+    });
   }
 
   @permission('mod.ban')
   async ban(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reason = ''} = opt as any
+    const { user = '', reason = '' } = opt as any;
     if (ctx.member.id == user || await testPermission(user, 'mod.noban'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
-      }
+      };
 
-    return null
+    return null;
   }
 
   @permission('mod.unban')
   async unban(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reason = ''} = opt as any
+    const { user = '', reason = '' } = opt as any;
 
-    return null
+    return null;
   }
 
   @permission('mod.mutevoice')
   async mutevoice(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reason = '', time = '30m' } = opt as any
+    const { user = '', reason = '', time = '30m' } = opt as any;
     if (ctx.member.id == user || await testPermission(user, 'mod.nomutevoice'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
-      }
+      };
 
-    const minTime = timeparser('30m')
-    const nowTime = timeparser(time)
+    const minTime = timeparser('30m');
+    const nowTime = timeparser(time);
 
-    if(nowTime < minTime)
+    if (nowTime < minTime)
       return {
         ephemeral: true,
         content: `Время блокировки не может быть меньше 30m!`
-      }
+      };
 
     api.append(user, mutes.voice, time, ctx.member.id, reason)
-      .catch(e => Logger.error(e))
+      .catch(e => Logger.error(e));
 
     return {
       ephemeral: true,
       content: `Выполнено!`
-    }
+    };
   }
 
   @permission('mod.unmutevoice')
   async unmutevoice(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reason = '' } = opt as any
+    const { user = '', reason = '' } = opt as any;
 
     api.delete(user, mutes.voice, ctx.member.id, reason)
-      .catch(e => Logger.error(e))
+      .catch(e => Logger.error(e));
 
     return {
       ephemeral: true,
       content: `Выполнено!`
-    }
+    };
   }
 
   @permission('mod.mutechat')
   async mutechat(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reason = '', time = '30m' } = opt as any
+    const { user = '', reason = '', time = '30m' } = opt as any;
     if (ctx.member.id == user || await testPermission(user, 'mod.nomutechat'))
       return {
         ephemeral: true,
         content: `Вы не можете применить эту команду к данному пользоватею!`
-      }
+      };
 
-    const minTime = timeparser('30m')
-    const nowTime = timeparser(time)
+    const minTime = timeparser('30m');
+    const nowTime = timeparser(time);
 
-    if(nowTime < minTime)
+    if (nowTime < minTime)
       return {
         ephemeral: true,
         content: `Время блокировки не может быть меньше 30m!`
-      }
+      };
 
     api.append(user, mutes.chat, time, ctx.member.id, reason)
-      .catch(e => Logger.error(e))
+      .catch(e => Logger.error(e));
 
     return {
       ephemeral: true,
       content: `Выполнено!`
-    }
+    };
   }
 
   @permission('mod.unmutechat')
   async unmutechat(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', reason = '' } = opt as any
+    const { user = '', reason = '' } = opt as any;
 
     api.delete(user, mutes.chat, ctx.member.id, reason)
-      .catch(e => Logger.error(e))
+      .catch(e => Logger.error(e));
 
     return {
       ephemeral: true,
       content: `Выполнено!`
-    }
+    };
   }
 
   @permission('mod.clear')
   async clear(ctx: CommandContext, opt: ConvertedOption) {
-    const { user = '', count = 0 } = opt as any
+    const { user = '', count = 0 } = opt as any;
 
-    if(count < 1 || count > 200)
+    if (count < 1 || count > 200)
       return {
         ephemeral: true,
         content: `Количество сообщений должно быть от 1 до 200!`
-      }
+      };
 
     chat.clearMessages(ctx.member.id, ctx.channelID, count, user)
-      .catch(e => null)
-      
+      .catch(e => null);
+
     return {
       ephemeral: true,
       content: `Запрос на выполнение передан!`
-    }
+    };
   }
 
   async run(ctx: CommandContext) {
-    const { options } = ctx
+    const { options } = ctx;
 
     try {
       for (let key in options)
         if (typeof this[key] == 'function')
           if (this[key].name == 'value')
-            return await this[key](ctx, options[key])
+            return await this[key](ctx, options[key]);
 
-      throw new Error('No method!')
+      throw new Error('No method!');
     } catch (e) {
-      Logger.error(e)
+      Logger.error(e);
       return {
         ephemeral: true,
         content: `Ошибка выполнения команды! Обратитесь за помощью к <@&805944675243917369>!`
-      }
+      };
     }
   }
 }
 
-export = Mods
+export = Mods;
